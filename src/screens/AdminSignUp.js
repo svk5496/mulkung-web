@@ -1,5 +1,4 @@
 import { gql, useMutation } from "@apollo/client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";

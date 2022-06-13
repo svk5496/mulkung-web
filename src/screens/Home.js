@@ -24,7 +24,7 @@ const SEEDETAIL_QUERY = gql`
       productSliderPictures {
         id
         order
-        link
+        productSliderPicture
       }
     }
   }

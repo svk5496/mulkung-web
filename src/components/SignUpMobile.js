@@ -57,7 +57,8 @@ const Input = styled.input`
   width: 150px;
   height: 20px;
   border-radius: 20px;
-  padding: 7px 20px;
+  padding: 2px 20px;
+  font-size: 12px;
   background-color: white;
   border: 0.5px solid
     ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};

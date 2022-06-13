@@ -33,12 +33,13 @@ const Rounded = styled.img`
 `;
 
 function ReactSlider({ data }) {
+  console.log(data);
   return (
     <SSlider>
       <Slider {...settings}>
         {data?.map((picture) => (
           <PicContainer key={picture.id}>
-            <Rounded src={picture.link}></Rounded>
+            <Rounded src={picture.productSliderPicture}></Rounded>
           </PicContainer>
         ))}
       </Slider>

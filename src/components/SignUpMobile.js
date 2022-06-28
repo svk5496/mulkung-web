@@ -10,13 +10,13 @@ const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccount(
     $firstName: String!
     $phone: String!
-    $size: String!
+    $age: String!
     $orderMethod: String!
   ) {
     createAccount(
       firstName: $firstName
       phone: $phone
-      size: $size
+      age: $age
       orderMethod: $orderMethod
     ) {
       ok
@@ -132,7 +132,7 @@ function SignUpMobile() {
   });
   const inputName = document.getElementById("inputName");
   const inputPhone = document.getElementById("inputPhone");
-  const inputSize = document.getElementById("inputSize");
+  const inputAge = document.getElementById("inputAge");
   const okBt = document.getElementById("okBt");
 
   const onSubmitValid = (data) => {
@@ -151,13 +151,13 @@ function SignUpMobile() {
     });
     inputName.value = null;
     inputPhone.value = null;
-    inputSize.options.length = 0;
+    inputAge.value = null;
     okBt.style.opacity = 0.5;
   };
 
   return (
     <AuthLayout>
-      <PageTitle title="Sign Up"></PageTitle>
+      <PageTitle title="오직편안함"></PageTitle>
 
       <MobileBox>
         <form onSubmit={handleSubmit(onSubmitValid)}>
@@ -184,36 +184,21 @@ function SignUpMobile() {
                 })}
                 name="phone"
                 type="text"
-                placeholder="-를 제외한 전화번호"
+                placeholder="핸드폰 번호(숫자만 입력)"
                 id="inputPhone"
               />
               <MobileError message={errors?.phone?.message}></MobileError>
-              <Select
-                ref={register({ required: "발사이즈를 선택해주세요" })}
-                name="size"
-                id="inputSize"
-              >
-                <option value="" defaultValue>
-                  발사이즈
-                </option>
-                <option value="220">220</option>
-                <option value="225">225</option>
-                <option value="230">230</option>
-                <option value="235">235</option>
-                <option value="240">240</option>
-                <option value="245">245</option>
-                <option value="250">250</option>
-                <option value="255">255</option>
-                <option value="260">260</option>
-                <option value="265">265</option>
-                <option value="270">270</option>
-                <option value="275">275</option>
-                <option value="280">280</option>
-                <option value="285">285</option>
-                <option value="290">290</option>
-                <option value="295">295</option>
-                <option value="300">300</option>
-              </Select>
+              <Input
+                ref={register({
+                  required: "나이를 입력해주세요",
+                })}
+                name="age"
+                type="text"
+                placeholder="나이"
+                id="inputAge"
+              />
+              <MobileError message={errors?.age?.message}></MobileError>
+
               <MobileError message={errors?.size?.message}></MobileError>
               <HiddenSelect name="orderMethod" ref={register({})}>
                 <option value="phone" defaultValue>

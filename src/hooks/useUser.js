@@ -18,7 +18,7 @@ function useUser() {
   useEffect(() => {
     if (data?.me === null) {
       console.log(
-        "there is toekn on ls but the token did not work on the backend"
+        "there is token on ls but the token did not work on the backend"
       );
       logUserOut();
     }

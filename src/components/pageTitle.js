@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 function PageTitle({ title }) {
   return (
     <Helmet>
-      <title>{title} | InstaClone</title>
+      <title>{title} | 물컹</title>
     </Helmet>
   );
 }

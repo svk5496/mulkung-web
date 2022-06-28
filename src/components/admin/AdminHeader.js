@@ -86,7 +86,7 @@ function AdminHeader() {
               <span>상품관리</span>
             </Menu>
           </Link>
-          <Link to={routes.adminOrder}>
+          <Link to={routes.adminOrderNew}>
             <Menu>
               <span>주문관리</span>
             </Menu>

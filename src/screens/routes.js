@@ -7,6 +7,10 @@ const routes = {
   admin: "/rhksflwkdjemals",
   adminStore: "/rhksflwkdjemals/store",
   adminProduct: "/rhksflwkdjemals/product",
-  adminOrder: "/rhksflwkdjemals/order",
+  adminOrderNew: "/rhksflwkdjemals/order/new",
+  adminOrderPaid: "/rhksflwkdjemals/order/paid",
+  adminOrderSent: "/rhksflwkdjemals/order/sent",
+  adminOrderReturned: "/rhksflwkdjemals/order/returned",
+  adminOrder: "/rhksflwkdjemals/order/:id",
 };
 export default routes;

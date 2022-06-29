@@ -71,10 +71,6 @@ const UserRow = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
 `;
 
 const PlaceOrderBt = styled.div`
@@ -105,7 +101,7 @@ const DELETE_ORDER_MUTATION = gql`
   }
 `;
 
-function OrderNewList({ data }) {
+function RefundedList({ data }) {
   const [checkedList, setCheckedList] = useState([]);
 
   const dataList = [];
@@ -184,18 +180,16 @@ function OrderNewList({ data }) {
                     : false
                 }
               ></input>
-              <span>신규 주문</span>
+              <span>결제 완료 주문</span>
             </label>
             <ButtonContainer>
-              <Link to={routes.adminOrderCreate}>
-                <PlaceOrderBt>
-                  <span>신규 주문서 작성</span>
-                </PlaceOrderBt>
-              </Link>
+              <PlaceOrderBt>
+                <span></span>
+              </PlaceOrderBt>
 
-              <DeleteBt onClick={deleteBt}>
-                <span>삭제</span>
-              </DeleteBt>
+              {/* <DeleteBt onClick={deleteBt}>
+                <span></span>
+              </DeleteBt> */}
             </ButtonContainer>
           </SubjectContainer>
           <UserContainer>
@@ -212,7 +206,7 @@ function OrderNewList({ data }) {
                         checked={checkedList.includes(order) ? true : false}
                       ></input>
                     </label>
-                    <Link to={`/rhksflwkdjemals/order/new/${order.id}`}>
+                    <Link to={`/rhksflwkdjemals/order/returned/${order.id}`}>
                       <UserInfo>
                         <span>{order.user.firstName}</span>
                         <span>
@@ -232,7 +226,7 @@ function OrderNewList({ data }) {
                 ))}
               </div>
             ) : (
-              <div>새로운 신규주문이 없습니다 </div>
+              <div>새로운 환불완료건이 없습니다 </div>
             )}
           </UserContainer>
         </div>
@@ -240,4 +234,4 @@ function OrderNewList({ data }) {
     </Content>
   );
 }
-export default OrderNewList;
+export default RefundedList;

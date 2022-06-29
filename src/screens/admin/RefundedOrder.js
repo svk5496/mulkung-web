@@ -4,9 +4,13 @@ import { useParams } from "react-router-dom";
 import OrderHeader from "../../components/admin/order/Header";
 import PageTitle from "../../components/pageTitle";
 import styled from "styled-components";
+import CryptoJS from "crypto-js";
+
 import {
   Checkbox,
   FlexBox,
+  HiddenBox,
+  HiddenInput,
   StyledInput,
   SubHeader,
 } from "../../components/shared";
@@ -15,36 +19,70 @@ import DaumPostcode from "react-daum-postcode";
 import { useHistory } from "react-router-dom";
 import routes from "../routes";
 
-const CREATE_ORDER_MUTATION = gql`
-  mutation createOrder(
-    $firstName: String!
-    $phone: String!
+const SEE_ORDER_DETAIL_QUERY = gql`
+  query SeeOrderDetail($id: Int!) {
+    seeOrderDetail(id: $id) {
+      id
+      orderMethod
+      status
+      o_name
+      o_phone
+      o_address
+      o_detailAddress
+      o_zipCode
+      user {
+        id
+        firstName
+        phone
+        age
+        creditCard
+        expireDate
+        cvcNumber
+        d_zipCode
+        d_address
+        d_detailAddress
+        shippingAddresses {
+          addressName
+          shippingName
+          shippingPhone
+          shippingAddress
+          shippingDetailAddress
+          shippingZipCode
+        }
+      }
+      orderItems {
+        id
+        color
+        size
+        amount
+        status
+        memo
+        trackingNumber
+      }
+    }
+  }
+`;
+
+const EDIT_PAID_ORDER_MUTATION = gql`
+  mutation editPaidOrder(
+    $id: Int!
     $status: String!
-    $orderMethod: String!
     $addressName: String!
     $shippingName: String!
     $shippingPhone: String!
     $shippingAddress: String!
     $shippingDetailAddress: String!
     $shippingZipCode: String!
-    $creditCard: String
-    $expireDate: String
-    $cvcNumber: String
   ) {
-    createOrder(
-      firstName: $firstName
-      phone: $phone
+    editPaidOrder(
+      id: $id
       status: $status
-      orderMethod: $orderMethod
       addressName: $addressName
       shippingName: $shippingName
       shippingPhone: $shippingPhone
       shippingAddress: $shippingAddress
       shippingDetailAddress: $shippingDetailAddress
       shippingZipCode: $shippingZipCode
-      creditCard: $creditCard
-      expireDate: $expireDate
-      cvcNumber: $cvcNumber
     ) {
       ok
       error
@@ -52,26 +90,18 @@ const CREATE_ORDER_MUTATION = gql`
   }
 `;
 
-const CREATE_ORDER_ITEM_MUTATION = gql`
-  mutation createOrderItem(
-    $orderId: Int
-    $productId: Int
-    $firstName: String
-    $phone: String
-    $status: String
-    $amount: String
-    $size: String
-    $color: String
+const EDIT_ORDER_ITEM_MUTATION = gql`
+  mutation EditOrderItem(
+    $orderItemId: Int!
+    $trackingNumber: String
+    $orderItemStatus: String
+    $memo: String
   ) {
-    createOrderItem(
-      orderId: $orderId
-      productId: $productId
-      firstName: $firstName
-      phone: $phone
-      status: $status
-      amount: $amount
-      size: $size
-      color: $color
+    editOrderItem(
+      orderItemId: $orderItemId
+      trackingNumber: $trackingNumber
+      orderItemStatus: $orderItemStatus
+      memo: $memo
     ) {
       ok
       error
@@ -112,10 +142,12 @@ const ShipInput = styled(StyledInput)`
 const ProductItem = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 40px;
+  height: 100%;
   padding: 30px 20px;
   border-bottom: 1px solid lightgray;
+  border-top: 1px solid ${(props) => props.theme.borderColor};
 `;
 
 const ProductHeader = styled.div`
@@ -124,13 +156,12 @@ const ProductHeader = styled.div`
   align-items: flex-end;
 `;
 
-const ProductButtons = styled.span`
-  margin-left: 20px;
-  cursor: pointer;
+const TrackingText = styled.div`
+  width: 100px;
 `;
 
 const ProductSelectBox = styled.div`
-  margin: 0px 14px;
+  margin: 10px 14px;
 `;
 
 const CompleteBox = styled.div`
@@ -159,12 +190,15 @@ const SearchBt = styled.span`
   margin-right: 2px;
 `;
 
-const StyledCheckBox = styled(Checkbox)`
-  width: 20px;
-  height: 20px;
-`;
+function ReturnedOrder() {
+  const { id } = useParams();
 
-function CreateOrder() {
+  const { _, data } = useQuery(SEE_ORDER_DETAIL_QUERY, {
+    variables: {
+      id: parseInt(id),
+    },
+  });
+
   const [visible, setVisible] = useState(false);
 
   const searchBt = () => {
@@ -187,7 +221,6 @@ function CreateOrder() {
     }
     setVisible(!visible);
 
-    //console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     const zoneCodeInput = document.getElementById("zoneCodeInput");
     zoneCodeInput.value = data.zonecode;
     const shippingAddressInput = document.getElementById(
@@ -196,35 +229,22 @@ function CreateOrder() {
     shippingAddressInput.value = fullAddress;
   };
 
-  const addButton = () => {
-    const productItem = document.getElementById("productItem");
-    const productBox = document.getElementById("productBox");
-    const copy = productItem.cloneNode(true);
-    productBox.appendChild(copy);
-  };
-
-  const removeButton = () => {
-    const productBox = document.getElementById("productBox");
-    const productItem = document.getElementById("productItem");
-    if (productBox.children.length > 1) {
-      productBox.removeChild(productItem);
-    }
-  };
-
   const history = useHistory();
 
   const onCompleted = (data) => {
     const {
-      createOrder: { ok, error },
+      editPaidOrder: { ok, error },
     } = data;
     if (!ok) {
-      console.log("!ok");
       return;
+    } else {
+      alert("저장 성공!");
     }
+    history.push(routes.adminOrderPaid);
+    window.location.reload();
   };
 
   const onOrderItemCompleted = (data1) => {
-    console.log("hi");
     const {
       createOrderItem: { ok, error },
     } = data1;
@@ -233,16 +253,13 @@ function CreateOrder() {
     }
   };
 
-  const [createOrder, {}] = useMutation(CREATE_ORDER_MUTATION, {
+  const [editPaidOrder, { loading }] = useMutation(EDIT_PAID_ORDER_MUTATION, {
     onCompleted,
   });
 
-  const [createOrderItem, { loading }] = useMutation(
-    CREATE_ORDER_ITEM_MUTATION,
-    {
-      onOrderItemCompleted,
-    }
-  );
+  const [editOrderItem, {}] = useMutation(EDIT_ORDER_ITEM_MUTATION, {
+    onOrderItemCompleted,
+  });
 
   const { register, handleSubmit, errors, formState, getValues } = useForm({
     mode: "onBlur",
@@ -252,41 +269,50 @@ function CreateOrder() {
     if (loading) {
       return;
     }
-    data.orderMethod = "phone";
-    data.status = "paid";
 
-    createOrder({
+    data.id = parseInt(data.id);
+
+    data.status = "refunded";
+    editPaidOrder({
       variables: {
         ...data,
       },
     });
-
-    const size = document.getElementsByName("size");
-    const amount = document.getElementsByName("amount");
-    const color = document.getElementsByName("color");
-    const productBox = document.getElementById("productBox");
-    const productBoxLength = productBox.children.length;
-
-    setTimeout(() => {
-      for (let i = 0; i < productBoxLength; i++) {
-        data.size = size[i].value;
-        data.amount = amount[i].value;
-        data.color = color[i].value;
-        data.productId = 1;
-        data.status = "paid";
-        createOrderItem({
-          variables: {
-            ...data,
-          },
-        });
-      }
-    }, 1000);
-
-    alert("저장이 완료되었습니다.");
-
-    history.push(routes.adminOrderPaid);
-    window.location.reload();
   };
+
+  let creditCard = "";
+  let cvcNumber = "";
+
+  if (data) {
+    const key = process.env.REACT_APP_CRYPTO_JS_KEY;
+    const iv = process.env.REACT_APP_CRYPTO_JS_SALT;
+
+    const keyutf = CryptoJS.enc.Utf8.parse(key);
+    const ivutf = CryptoJS.enc.Utf8.parse(iv);
+
+    const decCreditCard = CryptoJS.AES.decrypt(
+      {
+        ciphertext: CryptoJS.enc.Base64.parse(
+          data?.seeOrderDetail?.user?.creditCard
+        ),
+      },
+      keyutf,
+      { iv: ivutf }
+    );
+
+    const decCvcNumber = CryptoJS.AES.decrypt(
+      {
+        ciphertext: CryptoJS.enc.Base64.parse(
+          data?.seeOrderDetail?.user?.cvcNumber
+        ),
+      },
+      keyutf,
+      { iv: ivutf }
+    );
+
+    creditCard = CryptoJS.enc.Utf8.stringify(decCreditCard);
+    cvcNumber = CryptoJS.enc.Utf8.stringify(decCvcNumber);
+  }
 
   return (
     <div>
@@ -294,11 +320,20 @@ function CreateOrder() {
       <OrderHeader></OrderHeader>
       <form onSubmit={handleSubmit(onSubmitValid)}>
         <FormContainer>
+          <HiddenInput
+            value={parseInt(data?.seeOrderDetail?.id) || ""}
+            readOnly
+            ref={register()}
+            name="id"
+            type="text"
+            placeholder="이름"
+          ></HiddenInput>
           <InfoBox>
             <SubHeader>개인정보</SubHeader>
             <InputBox>
               <span>이름</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.firstName || ""}
                 ref={register({ required: "이름을 입력해주세요" })}
                 name="firstName"
                 type="text"
@@ -308,6 +343,7 @@ function CreateOrder() {
             <InputBox>
               <span>번호</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.phone || ""}
                 ref={register({ required: "번호를 입력해주세요" })}
                 name="phone"
                 type="text"
@@ -317,6 +353,7 @@ function CreateOrder() {
             <InputBox>
               <span>나이</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.age || ""}
                 ref={register({ required: "나이를 입력해주세요" })}
                 name="age"
                 type="text"
@@ -338,6 +375,7 @@ function CreateOrder() {
             <InputBox>
               <span>배송 받으시는 분 이름</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.firstName || ""}
                 placeholder="받는 사람 이름"
                 ref={register({ required: "이름을 입력" })}
                 name="shippingName"
@@ -346,6 +384,7 @@ function CreateOrder() {
             <InputBox>
               <span>배송 받은시는 분 번호</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.phone || ""}
                 placeholder="받는 사람 번호"
                 ref={register({ required: "전화번호를 입력" })}
                 name="shippingPhone"
@@ -355,6 +394,7 @@ function CreateOrder() {
               <span>배송지</span>
               <FlexBox>
                 <ShipInput
+                  defaultValue={data?.seeOrderDetail?.user?.d_zipCode || ""}
                   readOnly
                   ref={register({ required: "우편번호를 입력해주세요" })}
                   name="shippingZipCode"
@@ -372,6 +412,7 @@ function CreateOrder() {
 
             <InputBox>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.d_address || ""}
                 readOnly
                 ref={register({ required: "주소를 입력해주세요" })}
                 name="shippingAddress"
@@ -381,6 +422,7 @@ function CreateOrder() {
             </InputBox>
             <InputBox>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.d_detailAddress || ""}
                 ref={register({ required: "나머지 주소 입력" })}
                 name="shippingDetailAddress"
                 placeholder="나머지 주소 입력"
@@ -390,70 +432,68 @@ function CreateOrder() {
           <InfoBox>
             <ProductHeader>
               <SubHeader>주문상품</SubHeader>
-              <div>
-                <ProductButtons onClick={addButton}>추가</ProductButtons>
-                <ProductButtons onClick={removeButton}>제거</ProductButtons>
-              </div>
             </ProductHeader>
           </InfoBox>
           <ShipBox id="productBox">
-            <ProductItem id="productItem">
-              <span>옵션</span>
+            {data?.seeOrderDetail.orderItems.map((orderItem) => (
+              <ProductItem key={orderItem.id}>
+                <FlexBox>
+                  <HiddenInput
+                    value={parseInt(orderItem.id) || ""}
+                    readOnly
+                    ref={register()}
+                    name="orderItemId"
+                  ></HiddenInput>
+                  <TrackingText>
+                    <span>옵션</span>
+                  </TrackingText>
+                  <HiddenBox>
+                    <span>상품ID</span>
+                    <StyledInput defaultValue="1"></StyledInput>
+                  </HiddenBox>
+                  <span>사이즈 :</span>
 
-              <ProductSelectBox>
-                <span>사이즈</span>
-                <select
-                  ref={register({ required: "사이즈 옵션을 선택해주세요" })}
-                  name="size"
-                  id="size"
-                >
-                  <option>36(230-235mm)</option>
-                  <option>38(240-245mm)</option>
-                  <option>40(250-255mm)</option>
-                  <option>42(260-265mm)</option>
-                  <option>44(270-275mm)</option>
-                  <option>46(280-285mm)</option>
-                  <option>48(290-295mm)</option>
-                  <option>50(300-305mm)</option>
-                  <option>52(310-315mm)</option>
-                </select>
-              </ProductSelectBox>
-              <ProductSelectBox>
-                <span>컬러</span>
-                <select
-                  ref={register({ required: "색상을 선택해주세요" })}
-                  name="color"
-                  id="color"
-                >
-                  <option>베이지</option>
-                  <option>블랙</option>
-                  <option>네이비</option>
-                  <option>그레이</option>
-                  <option>핑크</option>
-                  <option>옐로우</option>
-                  <option>화이트</option>
-                </select>
-              </ProductSelectBox>
-              <ProductSelectBox>
-                <span>수량</span>
-                <select
-                  ref={register({ required: "수량을 선택해주세요" })}
-                  name="amount"
-                  id="amount"
-                >
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                  <option>6</option>
-                  <option>7</option>
-                  <option>8</option>
-                  <option>9</option>
-                  <option>10</option>
-                </select>
-              </ProductSelectBox>
-            </ProductItem>
+                  <ProductSelectBox>
+                    <span>{orderItem.size}</span>
+                  </ProductSelectBox>
+                  <ProductSelectBox>
+                    <span>컬러 :</span>
+                    <span>{orderItem.color}</span>
+                  </ProductSelectBox>
+                  <ProductSelectBox>
+                    <span>수량 :</span>
+                    <span>{orderItem.amount}</span>
+                  </ProductSelectBox>
+                </FlexBox>
+                <FlexBox>
+                  <TrackingText>
+                    <span>송장번호</span>
+                  </TrackingText>
+                  <StyledInput
+                    defaultValue={orderItem.trackingNumber || ""}
+                    ref={register({ required: "송장번호 입력해주세요" })}
+                    name="trackingNumber"
+                    placeholder="송장번호번호 16자리 입력"
+                    readOnly
+                  ></StyledInput>
+                </FlexBox>
+                <ProductSelectBox>
+                  <StyledInput
+                    readOnly
+                    defaultValue={orderItem.status}
+                  ></StyledInput>
+                </ProductSelectBox>
+                <FlexBox>
+                  <StyledInput
+                    ref={register()}
+                    defaultValue={orderItem.memo}
+                    name="memo"
+                    readOnly
+                    placeholder="필요시 메모 작성(예: 교환신청 사이즈 36 --> 38, 핑크)"
+                  ></StyledInput>
+                </FlexBox>
+              </ProductItem>
+            ))}
           </ShipBox>
 
           <InfoBox>
@@ -461,34 +501,34 @@ function CreateOrder() {
             <InputBox>
               <span>카드번호</span>
               <StyledInput
-                ref={register({ required: "카드번호를 입력해주세요" })}
+                defaultValue={creditCard || ""}
                 name="creditCard"
                 placeholder="카드번호 16자리 입력"
+                readOnly
               ></StyledInput>
             </InputBox>
             <InputBox>
               <span>유효기간(달/연)</span>
               <StyledInput
-                ref={register({ required: "유효기간을 입력해주세요" })}
+                defaultValue={data?.seeOrderDetail?.user?.expireDate || ""}
                 name="expireDate"
                 placeholder="Month/Year 4자리"
+                readOnly
               ></StyledInput>
             </InputBox>
             <InputBox>
               <span>cvc 넘버</span>
               <StyledInput
-                ref={register({ required: "cvc넘버를 입력하세요" })}
+                defaultValue={cvcNumber || ""}
                 name="cvcNumber"
                 placeholder="cvc넘버를 입력하세요"
+                readOnly
               ></StyledInput>
             </InputBox>
           </InfoBox>
-          <CompleteBox>
-            <SaveBt defaultValue="주문완료" type="submit"></SaveBt>
-          </CompleteBox>
         </FormContainer>
       </form>
     </div>
   );
 }
-export default CreateOrder;
+export default ReturnedOrder;

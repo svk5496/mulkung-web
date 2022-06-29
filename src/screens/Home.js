@@ -153,14 +153,12 @@ function Home() {
         `${nameArray[arrayNumber]}**님이 무료체험을 신청하셨습니다`,
         {
           autoClose: 2000,
-          position: toast.POSITION.TOP_CENTER,
+          position: "bottom-right",
         }
       );
       arrayNumber = Math.ceil(Math.random() * 30);
-    }, Math.ceil(Math.random() * 3000) + 5000);
+    }, Math.ceil(Math.random() * 3000) + 8000);
   }, []);
-
-  console.log({ data });
 
   return (
     <div>

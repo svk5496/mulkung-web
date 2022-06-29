@@ -73,29 +73,6 @@ const Input = styled.input`
   -webkit-appearance: none;
 `;
 
-const Select = styled.select`
-  width: 150px;
-  max-height: 25px;
-  border-radius: 20px;
-  padding: 2px 20px;
-  background-color: white;
-  font-size: 12px;
-  border: 0.5px solid
-    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
-  margin-top: 5px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  box-sizing: border-box;
-  &:focus {
-    border-color: ${(props) => props.theme.primary};
-  }
-
-  option {
-    background-color: ${(props) => props.theme.primary};
-    font-size: 12px;
-  }
-`;
-
 const Button = styled.input`
   border: none;
   margin-right: 6px;

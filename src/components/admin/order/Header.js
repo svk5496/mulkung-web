@@ -73,7 +73,7 @@ function OrderHeader() {
             <span>반품접수</span>
           </Menu>
         </Link>
-        <Link to={routes.adminOrderSent}>
+        <Link to={routes.adminOrderRefunded}>
           <Menu>
             <span>환불완료</span>
           </Menu>

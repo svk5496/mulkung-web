@@ -33,7 +33,6 @@ const Rounded = styled.img`
 `;
 
 function ReactSlider({ data }) {
-  console.log(data);
   return (
     <SSlider>
       <Slider {...settings}>

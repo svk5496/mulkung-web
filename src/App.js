@@ -24,7 +24,9 @@ import { darkTheme, GlobalStyles, lightTheme } from "./styles";
 import PaidOrder from "./screens/admin/PaidOrder";
 import SentOrder from "./screens/admin/SentOrder";
 import ReturnedOrder from "./screens/admin/ReturnedOrder";
+import RefundedOrder from "./screens/admin/RefundedOrder";
 import CreateOrder from "./screens/admin/CreateOrder";
+import RefundedLayout from "./components/admin/order/RefundedLayout";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -47,7 +49,7 @@ function App() {
               </Route>
 
               {isLoggedIn ? (
-                <div>
+                <>
                   <Route path={routes.admin} exact>
                     <AdminLayout>
                       <AdminStore></AdminStore>
@@ -78,7 +80,12 @@ function App() {
                       <ReturnedLayout></ReturnedLayout>
                     </AdminLayout>
                   </Route>
-                  <Route path={`/rhksflwkdjemals/order/new/new`}>
+                  <Route path={routes.adminOrderRefunded} exact>
+                    <AdminLayout>
+                      <RefundedLayout></RefundedLayout>
+                    </AdminLayout>
+                  </Route>
+                  <Route path={routes.adminOrderCreate} exact>
                     <AdminLayout>
                       <CreateOrder></CreateOrder>
                     </AdminLayout>
@@ -103,7 +110,12 @@ function App() {
                       <ReturnedOrder></ReturnedOrder>
                     </AdminLayout>
                   </Route>
-                </div>
+                  <Route path={`/rhksflwkdjemals/order/refunded/:id`}>
+                    <AdminLayout>
+                      <RefundedOrder></RefundedOrder>
+                    </AdminLayout>
+                  </Route>
+                </>
               ) : (
                 <AdminLogin></AdminLogin>
               )}

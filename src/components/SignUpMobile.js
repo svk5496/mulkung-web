@@ -5,6 +5,7 @@ import AuthLayout from "./auth/AuthLayout";
 import PageTitle from "./pageTitle";
 import { ToastContainer, toast } from "react-toastify";
 import MobileError from "./auth/MobileError";
+import { FlexBox } from "./shared";
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccount(
@@ -26,7 +27,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
 `;
 
 const MobileBox = styled.div`
-  width: 100%;
+  width: 90vw;
   height: 100%;
   background-color: ${(props) => props.theme.secondary};
   display: flex;
@@ -50,14 +51,18 @@ const FormContainer = styled.div`
 
 const InputContainer = styled.div`
   width: 100%;
-  margin-left: 6px;
+  span {
+    margin-right: 4px;
+    font-weight: 400;
+    color: white;
+  }
 `;
 
 const Input = styled.input`
-  width: 150px;
+  width: 80%;
   height: 20px;
   border-radius: 20px;
-  padding: 2px 20px;
+  padding: 2px 10px;
   font-size: 12px;
   background-color: white;
   border: 0.5px solid
@@ -71,6 +76,23 @@ const Input = styled.input`
     border-color: ${(props) => props.theme.primary};
   }
   -webkit-appearance: none;
+`;
+
+const InputComp = styled(FlexBox)`
+  align-items: center;
+  justify-content: center;
+  span {
+    font-size: 14px;
+  }
+`;
+
+const PhoneBox = styled(FlexBox)`
+  justify-content: space-between;
+  width: 80%;
+`;
+
+const PhoneInput = styled(Input)`
+  width: 31%;
 `;
 
 const Button = styled.input`
@@ -116,67 +138,83 @@ function SignUpMobile() {
     if (loading) {
       return;
     }
+
+    data.phone = data.phone1 + data.phone2 + data.phone3;
     createAccount({
       variables: {
         ...data,
       },
     });
 
-    toast.success("신청이 완료되었습니다", {
-      autoClose: 2000,
-      position: toast.POSITION.TOP_CENTER,
-    });
-    inputName.value = null;
-    inputPhone.value = null;
-    inputAge.value = null;
-    okBt.style.opacity = 0.5;
+    alert(
+      "신청이 완료되었습니다😀 영업일 기준 1~2일 내에 연락드리겠습니다📞 감사합니다🙌"
+    );
+    window.location.reload();
   };
 
   return (
-    <AuthLayout>
+    <div>
       <PageTitle title="오직편안함"></PageTitle>
 
       <MobileBox>
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <FormContainer>
             <InputContainer>
-              <div>
+              <InputComp>
+                <span>이름</span>
                 <Input
                   ref={register({ required: "이름을 입력해주세요" })}
                   name="firstName"
                   type="text"
                   id="inputName"
-                  placeholder="이름"
                 />
-              </div>
+              </InputComp>
 
-              <MobileError message={errors?.firstName?.message}></MobileError>
-              <Input
-                ref={register({
-                  required: "전화번호를 입력해주세요",
-                  minLength: {
-                    value: 9,
-                    message: "전화번호는 11자리를 입력해주세요",
-                  },
-                })}
-                name="phone"
-                type="text"
-                placeholder="핸드폰 번호(숫자만 입력)"
-                id="inputPhone"
-              />
-              <MobileError message={errors?.phone?.message}></MobileError>
-              <Input
-                ref={register({
-                  required: "나이를 입력해주세요",
-                })}
-                name="age"
-                type="text"
-                placeholder="나이"
-                id="inputAge"
-              />
-              <MobileError message={errors?.age?.message}></MobileError>
+              <InputComp>
+                <span>번호</span>
+                <PhoneBox>
+                  <PhoneInput
+                    ref={register({
+                      required: "전화번호를 입력해주세요",
+                    })}
+                    name="phone1"
+                    type="text"
+                    id="inputPhone1"
+                    maxLength={3}
+                  />
+                  <PhoneInput
+                    ref={register({
+                      required: "전화번호를 입력해주세요",
+                    })}
+                    name="phone2"
+                    type="text"
+                    id="inputPhone2"
+                    maxLength={4}
+                  />
+                  <PhoneInput
+                    ref={register({
+                      required: "전화번호를 입력해주세요",
+                    })}
+                    name="phone3"
+                    type="text"
+                    id="inputPhone3"
+                    maxLength={4}
+                  />
+                </PhoneBox>
+              </InputComp>
+              <InputComp>
+                <span>나이</span>
+                <Input
+                  ref={register({
+                    required: "나이를 입력해주세요",
+                  })}
+                  name="age"
+                  type="number"
+                  id="inputAge"
+                  maxLength={3}
+                />
+              </InputComp>
 
-              <MobileError message={errors?.size?.message}></MobileError>
               <HiddenSelect name="orderMethod" ref={register({})}>
                 <option value="phone" defaultValue>
                   전화로 상담받기
@@ -187,14 +225,14 @@ function SignUpMobile() {
 
             <Button
               type="submit"
-              value="무료체험 신청하기"
+              value="7일 무료체험 신청하기"
               disabled={!formState.isValid || loading}
               id="okBt"
             />
           </FormContainer>
         </form>
       </MobileBox>
-    </AuthLayout>
+    </div>
   );
 }
 export default SignUpMobile;

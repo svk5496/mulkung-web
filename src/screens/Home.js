@@ -153,7 +153,7 @@ function Home() {
         `${nameArray[arrayNumber]}**님이 무료체험을 신청하셨습니다`,
         {
           autoClose: 2000,
-          position: "bottom-right",
+          position: "",
         }
       );
       arrayNumber = Math.ceil(Math.random() * 30);

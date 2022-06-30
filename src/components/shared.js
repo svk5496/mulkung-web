@@ -32,8 +32,12 @@ export const HiddenBox = styled.div`
 export const FlexBox = styled.div`
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+`;
+
+export const FlexColumBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const Checkbox = styled.input`

@@ -38,8 +38,9 @@ const Logo = styled.div`
 `;
 
 const H2 = styled.span`
-  font-size: ${(props) => props.theme.fs_body3};
-  font-weight: ${(props) => props.theme.fw_medium};
+  font-size: 12px;
+  margin: 3px 0px;
+  font-weight: 400;
   color: ${(props) => props.theme.bgColorDark};
   padding: 3px 0px;
 `;
@@ -69,7 +70,7 @@ function Header() {
       <Logo>
         <img src="https://gi.esmplus.com/kishop1121/web/shared/logo_long.png"></img>
       </Logo>
-      <H2>족저근막염 달고 사시는 분 잠시만요!</H2>
+      <H2>98.4%의 압축복원율로 오래걸어도 편안함이 지속되는 특허신발</H2>
       <PhoneContainer>
         <H1>대표전화 1688 - 3596</H1>
         <CallBt onClick={handleClick}>전화하기</CallBt>

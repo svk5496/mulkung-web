@@ -180,9 +180,9 @@ function ProductList({ data }) {
               </PlaceOrderBt>
             </Link>
 
-            <DeleteBt onClick={deleteBt}>
+            {/* <DeleteBt onClick={deleteBt}>
               <span>삭제</span>
-            </DeleteBt>
+            </DeleteBt> */}
           </ButtonContainer>
           <SubjectContainer>
             <label>

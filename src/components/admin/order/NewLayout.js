@@ -30,7 +30,7 @@ const Layer = styled.div`
 `;
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100%;
   display: flex;
 `;
@@ -83,10 +83,10 @@ export const RowFlexBox = styled.div`
 `;
 
 const DateInputBox = styled.div`
-  width: 100%;
+  width: 46%;
   height: 34px;
   border: solid 1px darkgreen;
-  margin: 0px 3px;
+  margin: 0px 0px;
   padding-left: 6px;
   cursor: pointer;
   display: flex;

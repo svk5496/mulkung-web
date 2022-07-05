@@ -99,6 +99,7 @@ const EDIT_ORDER_ITEM_MUTATION = gql`
 
 const FormContainer = styled.div`
   width: 100%;
+  max-width: 800px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -108,7 +109,7 @@ const FormContainer = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 40%;
+  width: 100%;
   border-radius: 5px;
   padding: 20px 20px;
 `;

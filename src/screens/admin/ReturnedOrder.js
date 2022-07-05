@@ -112,6 +112,7 @@ const EDIT_ORDER_ITEM_MUTATION = gql`
 const FormContainer = styled.div`
   width: 100%;
   height: 100%;
+  max-width: 800px;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -120,7 +121,7 @@ const FormContainer = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 40%;
+  width: 100%;
   border-radius: 5px;
   padding: 20px 20px;
 `;

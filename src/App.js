@@ -13,7 +13,6 @@ import ReturnedLayout from "./components/admin/order/ReturnedLayout";
 import Layout from "./components/Layout";
 import AdminLogin from "./screens/AdminLogin";
 import NewOrder from "./screens/admin/NewOrder";
-import AdminProduct from "./screens/AdminProduct";
 import AdminSignUp from "./screens/AdminSignUp";
 import AdminStore from "./screens/AdminStore";
 import Home from "./screens/Home";
@@ -27,6 +26,10 @@ import ReturnedOrder from "./screens/admin/ReturnedOrder";
 import RefundedOrder from "./screens/admin/RefundedOrder";
 import CreateOrder from "./screens/admin/CreateOrder";
 import RefundedLayout from "./components/admin/order/RefundedLayout";
+import ProductListLayout from "./components/admin/product/ProductListLayout";
+import EditLayout from "./components/admin/product/EditLayout";
+import ProductUploadLayout from "./components/admin/product/UploadLayout";
+import UserListLayout from "./components/admin/user/UserListLayout";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -55,11 +58,29 @@ function App() {
                       <AdminStore></AdminStore>
                     </AdminLayout>
                   </Route>
-                  <Route path={routes.adminProduct} exact>
+                  {/* 관리자 유저관리 */}
+                  <Route path={routes.adminUser} exact>
                     <AdminLayout>
-                      <AdminProduct></AdminProduct>
+                      <UserListLayout></UserListLayout>
                     </AdminLayout>
                   </Route>
+                  {/* 관리자 상품관리 */}
+                  <Route path={routes.adminProduct} exact>
+                    <AdminLayout>
+                      <ProductListLayout></ProductListLayout>
+                    </AdminLayout>
+                  </Route>
+                  <Route path={routes.adminProductEdit} exact>
+                    <AdminLayout>
+                      <EditLayout></EditLayout>
+                    </AdminLayout>
+                  </Route>
+                  <Route path={routes.adminProductNew} exact>
+                    <AdminLayout>
+                      <ProductUploadLayout></ProductUploadLayout>
+                    </AdminLayout>
+                  </Route>
+                  {/* 관리자 주문관리 */}
                   <Route path={routes.adminOrderNew} exact>
                     <AdminLayout>
                       <NewLayout></NewLayout>

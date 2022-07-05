@@ -13,6 +13,9 @@ import styled from "styled-components";
 import { isLoggedInVar, logUserOut } from "../../apollo";
 import useUser from "../../hooks/useUser";
 import routes from "../../screens/routes";
+import { BsBagCheck, BsBoxSeam } from "react-icons/bs";
+import { MdDashboard } from "react-icons/md";
+import { AiOutlineUser } from "react-icons/ai";
 
 const HeaderContainer = styled.div`
   width: 100%;
@@ -24,29 +27,28 @@ const HeaderContainer = styled.div`
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 `;
 
-const LogoContainer = styled.div`
-  width: 80px;
-  height: 38px;
-`;
-
-const Logo = styled.img`
+const LogoBox = styled.div`
+  height: 50px;
   width: 100%;
-  height: 100%;
+  margin: 10px 0px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 `;
 
 const MenuContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  border-bottom: 1px solid ${(props) => props.theme.secondary};
-  height: 60px;
+  flex-direction: column;
+
   a {
     text-decoration: none;
     color: ${(props) => props.theme.fontColorBase};
@@ -57,15 +59,26 @@ const Menu = styled.div`
   display: flex;
   align-items: center;
   text-decoration: none;
-  margin-left: 12px;
-  cursor: pointer;
+  margin-bottom: 20px;
+  padding: 0px 20px;
   span {
-    font-size: 20px;
-    margin: 20px;
-    &:hover {
-      text-decoration: underline;
-    }
+    font-size: 16px;
+
+    padding: 15px 20px;
   }
+  &:hover {
+    text-decoration: underline;
+    transform: scale(1.04);
+    transition: ease-in-out 0.1s;
+  }
+  &.active {
+    background-color: ${(props) => props.theme.bgColorDark};
+  }
+  border-radius: 10px;
+`;
+
+const ActiveMenu = styled(Menu)`
+  background-color: ${(props) => props.theme.bgColorDark};
 `;
 
 function AdminHeader() {
@@ -75,19 +88,32 @@ function AdminHeader() {
   return (
     <HeaderContainer>
       <Wrapper>
+        <LogoBox>
+          <img src="https://gi.esmplus.com/kishop1121/web/shared/logo_long.png"></img>
+        </LogoBox>
         <MenuContainer>
           <Link to={routes.admin}>
             <Menu>
-              <span>상점관리</span>
+              <MdDashboard size="18"></MdDashboard>
+              <span>대시보드</span>
+            </Menu>
+          </Link>
+          <Link to={routes.adminUser}>
+            <Menu>
+              <AiOutlineUser size="18"></AiOutlineUser>
+              <span>사용자</span>
             </Menu>
           </Link>
           <Link to={routes.adminProduct}>
             <Menu>
+              <BsBoxSeam size="18"></BsBoxSeam>
+
               <span>상품관리</span>
             </Menu>
           </Link>
           <Link to={routes.adminOrderNew}>
             <Menu>
+              <BsBagCheck size="18" />
               <span>주문관리</span>
             </Menu>
           </Link>

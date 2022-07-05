@@ -6,7 +6,15 @@ const routes = {
   adminSignUp: "/admin-sign-up",
   admin: "/rhksflwkdjemals",
   adminStore: "/rhksflwkdjemals/store",
+  // 유저 관련 page
+  adminUser: "/rhksflwkdjemals/user",
+  adminUserEdit: "rhksflwkdjemals/user/edit/:id",
+  adminUserNew: "rhksflwkdjemals/user/new",
+  // 상품 관련 page
   adminProduct: "/rhksflwkdjemals/product",
+  adminProductEdit: "/rhksflwkdjemals/product/edit/:id",
+  adminProductNew: "/rhksflwkdjemals/product/new",
+  // 주문 관련 page
   adminOrderNew: "/rhksflwkdjemals/order/new",
   adminOrderPaid: "/rhksflwkdjemals/order/paid",
   adminOrderSent: "/rhksflwkdjemals/order/sent",

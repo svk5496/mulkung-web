@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import AuthButton from "../../auth/AuthButton";
+import { useParams } from "react-router-dom";
 
 const UploadContainer = styled.div`
   padding-top: 40px;
@@ -61,6 +62,21 @@ const UploadFormBox = styled.div`
   }
 `;
 
+const SEE_PRODUCT_DETAIL_QUERY = gql`
+  query seeProductDetail($id: Int!) {
+    seeProductDetail(id: $id) {
+      id
+      productName
+      price
+      detailPage1
+      detailPage2
+      productSliderPictures {
+        productSliderPicture
+      }
+    }
+  }
+`;
+
 const EDIT_PRODUCT_MUTATION = gql`
   mutation editProduct(
     $productName: String!
@@ -86,7 +102,7 @@ const EDIT_PRODUCT_MUTATION = gql`
   }
 `;
 
-function ProductEditLayout() {
+function EditLayout() {
   const onCompleted = (data) => {
     const {
       editProduct: { ok, error },
@@ -98,6 +114,17 @@ function ProductEditLayout() {
       alert("등록이 완료되었습니다.");
     }
   };
+
+  const { id } = useParams();
+
+  const { _, data } = useQuery(SEE_PRODUCT_DETAIL_QUERY, {
+    variables: {
+      id: parseInt(id),
+    },
+  });
+
+  console.log(data);
+
   const [createProduct, { loading }] = useMutation(EDIT_PRODUCT_MUTATION, {
     onCompleted,
   });
@@ -113,8 +140,6 @@ function ProductEditLayout() {
       data.price = parseInt(data.price);
     }
 
-    console.log(data);
-
     createProduct({
       variables: {
         ...data,
@@ -123,14 +148,15 @@ function ProductEditLayout() {
   };
   return (
     <UploadContainer>
-      <Subtitle>상품수수수수수정!</Subtitle>
+      <Subtitle>상품수정</Subtitle>
       <UploadFormBox>
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <InputContainer>
             <InputName>상품명</InputName>
             <ProductInput
-              ref={register({ required: "상품명을 입력해주세요" })}
+              ref={register()}
               name="productName"
+              defaultValue={data?.seeProductDetail.productName}
               type="text"
               placeholder="상품명"
             ></ProductInput>
@@ -138,8 +164,9 @@ function ProductEditLayout() {
           <InputContainer>
             <InputName>가격</InputName>
             <ProductInput
-              ref={register({ required: "가격" })}
+              ref={register()}
               name="price"
+              defaultValue={data?.seeProductDetail.price}
               type="text"
               placeholder="가격"
             ></ProductInput>
@@ -147,8 +174,9 @@ function ProductEditLayout() {
           <InputContainer>
             <InputName>페이지1</InputName>
             <ProductInput
-              ref={register({ required: "페이지1" })}
+              ref={register()}
               name="detailPage1"
+              defaultValue={data?.seeProductDetail.detailPage1}
               type="text"
               placeholder="HTML"
             ></ProductInput>
@@ -156,8 +184,9 @@ function ProductEditLayout() {
           <InputContainer>
             <InputName>페이지2</InputName>
             <ProductInput
-              ref={register({ required: "페이지2" })}
+              ref={register()}
               name="detailPage2"
+              defaultValue={data?.seeProductDetail.detailPage2}
               type="text"
               placeholder="HTML"
             ></ProductInput>
@@ -189,14 +218,10 @@ function ProductEditLayout() {
               placeholder=",로 구분(optional)"
             ></ProductInput>
           </InputContainer>
-          <AuthButton
-            type="submit"
-            value="수수수수정하기"
-            disabled={!formState.isValid || loading}
-          />
+          <AuthButton type="submit" value="수정하기" />
         </form>
       </UploadFormBox>
     </UploadContainer>
   );
 }
-export default ProductEditLayout;
+export default EditLayout;

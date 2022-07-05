@@ -50,7 +50,7 @@ const FormContainer = styled.div`
 `;
 
 const InputContainer = styled.div`
-  width: 100%;
+  width: 60%;
   span {
     margin-right: 4px;
     font-weight: 400;
@@ -97,7 +97,7 @@ const PhoneInput = styled(Input)`
 
 const Button = styled.input`
   border: none;
-  margin-right: 6px;
+  margin: 0px 6px;
   border-radius: 10px;
 
   margin-top: 10px;
@@ -106,7 +106,7 @@ const Button = styled.input`
   text-align: center;
   padding: 14px 0px;
   font-weight: 600;
-  width: 100%;
+  width: 40%;
   opacity: ${(props) => (props.disabled ? "0.6" : "1")};
 `;
 

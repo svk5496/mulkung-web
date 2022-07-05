@@ -23,7 +23,7 @@ export const lightTheme = {
   bgGrayDark: "#DFDFDF",
   bgColorLight: "#F6F6EE",
   bgColor: "#F5F8E5",
-  bgColorDark: "#E6EACB",
+  bgColorDark: "#E0EC83",
 
   fs_headline1: "80px",
   fs_headline2: "56px",

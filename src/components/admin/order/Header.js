@@ -13,8 +13,7 @@ import styled from "styled-components";
 import routes from "../../../screens/routes";
 
 const HeaderContainer = styled.div`
-  width: 98vw;
-  margin: 0px 10px;
+  width: 100%;
   display: flex;
   flex-direction: column;
 `;

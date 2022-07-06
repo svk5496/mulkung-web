@@ -30,6 +30,7 @@ import ProductListLayout from "./components/admin/product/ProductListLayout";
 import EditLayout from "./components/admin/product/EditLayout";
 import ProductUploadLayout from "./components/admin/product/UploadLayout";
 import UserListLayout from "./components/admin/user/UserListLayout";
+import Product from "./screens/Product";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -44,6 +45,11 @@ function App() {
               <Route path={routes.home} exact>
                 <Layout>
                   <Home></Home>
+                </Layout>
+              </Route>
+              <Route path={routes.product} exact>
+                <Layout>
+                  <Product></Product>
                 </Layout>
               </Route>
 

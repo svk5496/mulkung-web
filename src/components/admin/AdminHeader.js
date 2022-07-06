@@ -88,9 +88,11 @@ function AdminHeader() {
   return (
     <HeaderContainer>
       <Wrapper>
-        <LogoBox>
-          <img src="https://gi.esmplus.com/kishop1121/web/shared/logo_long.png"></img>
-        </LogoBox>
+        <Link to={routes.admin}>
+          <LogoBox>
+            <img src="https://gi.esmplus.com/kishop1121/web/shared/logo_long.png"></img>
+          </LogoBox>
+        </Link>
         <MenuContainer>
           <Link to={routes.admin}>
             <Menu>

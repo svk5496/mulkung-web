@@ -1,11 +1,9 @@
 import { gql, useMutation, useReactiveVar } from "@apollo/client";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
-
 import { useCallback, useState } from "react";
 import { Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-
 import routes from "../../../screens/routes";
 
 const Content = styled.main`

@@ -19,6 +19,28 @@ const Notification = styled.div`
   color: green;
 `;
 
+const BaseBox = styled.div`
+  width: 100%;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const UpperBox = styled.div`
+  width: 100%;
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+`;
+
+const FormBox = styled.div`
+  width: 50%;
+  min-width: 320px;
+`;
+
 const LOGIN_MUTATION = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
@@ -78,48 +100,59 @@ function AdminLogin() {
   return (
     <AuthLayout>
       <PageTitle title="Login"></PageTitle>
-      <AuthFormBox>
-        {/* <div>
+      <BaseBox>
+        <UpperBox>
+          <span>관리자 로그인</span>
+        </UpperBox>
+        <FormBox>
+          <AuthFormBox>
+            {/* <div>
             <FontAwesomeIcon icon={faInstagram} size="3x" />
           </div> */}
-        <Notification>{location?.state?.message}</Notification>
-        <form onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}>
-          <AuthInput
-            ref={register({
-              required: "이메일을 입력해주세요",
-              minLength: { value: 1, message: "5자 이상 입력해주세요" },
-              //validate: (currentValue) => currentValue.includes(".com"),
-            })}
-            onChange={() => clearErrors("result")}
-            name="username"
-            type="text"
-            placeholder="아이디"
-            hasError={Boolean(errors?.username?.message)}
-          />
-          <AuthFormError message={errors?.username?.message}></AuthFormError>
-          <AuthInput
-            ref={register({ required: "비밀번호를 입력해주세요" })}
-            name="password"
-            type="password"
-            placeholder="비밀번호"
-            onChange={() => clearErrors("result")}
-            hasError={Boolean(errors?.username?.message)}
-          />
-          <AuthFormError message={errors?.password?.message}></AuthFormError>
-          <AuthButton
-            type="submit"
-            value="Log in"
-            disabled={!formState.isValid || loading}
-          />
-          <AuthFormError message={errors?.result?.message}></AuthFormError>
-        </form>
-        <Seperator />
-      </AuthFormBox>
-      <AuthBottomBox
-        cta="Don't have an account"
-        linkText="Sign up"
-        link={routes.adminSignUp}
-      ></AuthBottomBox>
+            <Notification>{location?.state?.message}</Notification>
+            <form onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}>
+              <AuthInput
+                ref={register({
+                  required: "이메일을 입력해주세요",
+                  minLength: { value: 1, message: "5자 이상 입력해주세요" },
+                  //validate: (currentValue) => currentValue.includes(".com"),
+                })}
+                onChange={() => clearErrors("result")}
+                name="username"
+                type="text"
+                placeholder="아이디"
+                hasError={Boolean(errors?.username?.message)}
+              />
+              <AuthFormError
+                message={errors?.username?.message}
+              ></AuthFormError>
+              <AuthInput
+                ref={register({ required: "비밀번호를 입력해주세요" })}
+                name="password"
+                type="password"
+                placeholder="비밀번호"
+                onChange={() => clearErrors("result")}
+                hasError={Boolean(errors?.username?.message)}
+              />
+              <AuthFormError
+                message={errors?.password?.message}
+              ></AuthFormError>
+              <AuthButton
+                type="submit"
+                value="Log in"
+                disabled={!formState.isValid || loading}
+              />
+              <AuthFormError message={errors?.result?.message}></AuthFormError>
+            </form>
+            <Seperator />
+          </AuthFormBox>
+          <AuthBottomBox
+            cta="Don't have an account"
+            linkText="Sign up"
+            link={routes.adminSignUp}
+          ></AuthBottomBox>
+        </FormBox>
+      </BaseBox>
     </AuthLayout>
   );
 }

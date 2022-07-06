@@ -167,7 +167,6 @@ function ProductList({ data }) {
       alert("삭제할 항목을 먼저 눌러주세요");
     }
   };
-  console.log(data);
 
   return (
     <Content>

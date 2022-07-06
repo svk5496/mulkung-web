@@ -85,7 +85,6 @@ function ProductListLayout() {
   const [name, setName] = useState("");
 
   const { register, handleSubmit, formState } = useForm();
-  console.log(name);
 
   const { data } = useQuery(SEE_PRODUCTS_QUERY, {
     variables: {

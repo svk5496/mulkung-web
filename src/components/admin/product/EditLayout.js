@@ -3,6 +3,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import AuthButton from "../../auth/AuthButton";
 import { useParams } from "react-router-dom";
+import { HiddenInput } from "../../shared";
 
 const UploadContainer = styled.div`
   padding-top: 40px;
@@ -79,6 +80,7 @@ const SEE_PRODUCT_DETAIL_QUERY = gql`
 
 const EDIT_PRODUCT_MUTATION = gql`
   mutation editProduct(
+    $id: Int!
     $productName: String!
     $price: Int!
     $detailPage1: String!
@@ -88,6 +90,7 @@ const EDIT_PRODUCT_MUTATION = gql`
     $productSliderPicture: String
   ) {
     editProduct(
+      id: $id
       productName: $productName
       price: $price
       detailPage1: $detailPage1
@@ -111,7 +114,7 @@ function EditLayout() {
       alert(error);
       return;
     } else {
-      alert("등록이 완료되었습니다.");
+      alert("변경이 완료되었습니다.");
     }
   };
 
@@ -125,7 +128,7 @@ function EditLayout() {
 
   console.log(data);
 
-  const [createProduct, { loading }] = useMutation(EDIT_PRODUCT_MUTATION, {
+  const [editProduct, { loading }] = useMutation(EDIT_PRODUCT_MUTATION, {
     onCompleted,
   });
   const { register, handleSubmit, errors, formState, getValues } = useForm({
@@ -140,7 +143,11 @@ function EditLayout() {
       data.price = parseInt(data.price);
     }
 
-    createProduct({
+    console.log(data);
+
+    data.id = parseInt(data.id);
+
+    editProduct({
       variables: {
         ...data,
       },
@@ -153,6 +160,7 @@ function EditLayout() {
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <InputContainer>
             <InputName>상품명</InputName>
+
             <ProductInput
               ref={register()}
               name="productName"
@@ -161,6 +169,13 @@ function EditLayout() {
               placeholder="상품명"
             ></ProductInput>
           </InputContainer>
+          <HiddenInput
+            ref={register()}
+            name="id"
+            defaultValue={parseInt(id)}
+            type="text"
+            placeholder="상품명"
+          ></HiddenInput>
           <InputContainer>
             <InputName>가격</InputName>
             <ProductInput

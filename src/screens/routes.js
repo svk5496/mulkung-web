@@ -6,6 +6,8 @@ const routes = {
   adminSignUp: "/admin-sign-up",
   admin: "/rhksflwkdjemals",
   adminStore: "/rhksflwkdjemals/store",
+  // 랜딩 관련 Page
+  product: "/product/:id",
   // 유저 관련 page
   adminUser: "/rhksflwkdjemals/user",
   adminUserEdit: "rhksflwkdjemals/user/edit/:id",

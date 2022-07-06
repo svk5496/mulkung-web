@@ -34,7 +34,7 @@ const HeaderArea = styled.div`
 
 const ContentArea = styled.div`
   width: 86%;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 const Content = styled.main`

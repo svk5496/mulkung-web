@@ -117,15 +117,12 @@ function Product() {
     },
   });
 
-  const detail1 = data?.seeDetail?.detailPage1;
-  const detail2 = data?.seeDetail?.detailPage2;
-
   function createDetail1() {
-    return { __html: detail1 };
+    return { __html: data?.seeDetail?.detailPage1 };
   }
 
   function createDetail2() {
-    return { __html: detail2 };
+    return { __html: data?.seeDetail?.detailPage2 };
   }
 
   const isMobile = useMediaQuery({

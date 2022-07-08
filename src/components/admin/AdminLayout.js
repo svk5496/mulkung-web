@@ -20,7 +20,7 @@ const AdminContainer = styled.div`
 const AdminBox = styled.div`
   width: 98%;
   height: 95%;
-  background-color: ${(props) => props.theme.bgGrayLight};
+  background-color: ${(props) => props.theme.bgColorLight};
   display: flex;
   border-radius: 20px;
   overflow: hidden;

@@ -21,7 +21,7 @@ export const lightTheme = {
   bgGrayLight: "#EFEFEF",
   bgGray: "#7f7f7f",
   bgGrayDark: "#DFDFDF",
-  bgColorLight: "#F6F6EE",
+  bgColorLight: "#F6FFEB",
   bgColor: "#F5F8E5",
   bgColorDark: "#E0EC83",
 

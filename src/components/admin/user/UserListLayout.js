@@ -176,7 +176,7 @@ function UserListLayout() {
                     ref={register({ required: false })}
                     name="productName"
                     type="text"
-                    placeholder="이름이나 번호를 입력하세요"
+                    placeholder="이름을 입력하세요"
                     id="userNameIp"
                   ></SearchInput>
                   <SearchBt readOnly type="submit" value="검색"></SearchBt>

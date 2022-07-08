@@ -174,7 +174,7 @@ function EditLayout() {
             name="id"
             defaultValue={parseInt(id)}
             type="text"
-            placeholder="상품명"
+            placeholder="아이디"
           ></HiddenInput>
           <InputContainer>
             <InputName>가격</InputName>

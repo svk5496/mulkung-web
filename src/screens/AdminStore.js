@@ -2,6 +2,16 @@ import { gql, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import routes from "./routes";
+import Chart from "react-apexcharts";
+import {
+  formatedDay0,
+  formatedDay1,
+  formatedDay2,
+  formatedDay3,
+  formatedDay4,
+  formatedDay5,
+  formatedDay6,
+} from "../components/sharedFunction";
 
 const Base = styled.div`
   width: 100%;
@@ -26,13 +36,15 @@ const DashContainer = styled.div`
   width: 100%;
   height: 30%;
   padding: 0px 30px;
+  margin-bottom: 40px;
   display: flex;
   justify-content: space-between;
 `;
 
 const DashBox = styled.div`
   min-width: 300px;
-  width: 32%;
+  width: 100%;
+  margin: 0px 20px;
   min-height: 200px;
   height: 100%;
   padding: 20px;
@@ -51,6 +63,7 @@ const UpperDashBox = styled.div`
     color: gray;
   }
 `;
+
 const MiddleDashBox = styled.div`
   width: 100%;
   height: 70%;
@@ -76,6 +89,25 @@ const BottomDashBox = styled.div`
   }
 `;
 
+const ChartContainer = styled(DashContainer)`
+  min-height: 300px;
+  height: 44%;
+`;
+
+const ChartBox = styled.div`
+  width: 100%;
+  height: 70%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ChartBottomBox = styled(BottomDashBox)`
+  span {
+    text-decoration: none;
+  }
+`;
+
 const SEE_DASH_BOARD_QUERY = gql`
   query SeeDashBoard {
     seeDashBoard {
@@ -84,6 +116,16 @@ const SEE_DASH_BOARD_QUERY = gql`
       countUsers
       countOrders
       countRefunds
+      landing1TotalPurchase
+      landing2TotalPurchase
+      chart1Object {
+        name
+        data
+      }
+      chart2Object {
+        name
+        data
+      }
     }
   }
 `;
@@ -91,7 +133,49 @@ const SEE_DASH_BOARD_QUERY = gql`
 function AdminStore() {
   const { data, loading } = useQuery(SEE_DASH_BOARD_QUERY, {});
 
+  const option = {
+    options: {
+      chart: {
+        type: "area",
+        height: "auto",
+      },
+      fill: {
+        colors: ["#307157"],
+      },
+      stroke: {
+        curve: "smooth",
+        colors: ["white"],
+      },
+      grid: {
+        show: true,
+      },
+      xaxis: {
+        type: "datatime",
+        categories: [
+          formatedDay6,
+          formatedDay5,
+          formatedDay4,
+          formatedDay3,
+          formatedDay2,
+          formatedDay1,
+          formatedDay0,
+        ],
+      },
+      tooltip: {
+        x: {
+          format: "dd/MM/yy",
+        },
+      },
+      dataLabels: {
+        style: {
+          colors: ["#307157"],
+        },
+      },
+    },
+  };
+
   console.log(data);
+
   return (
     <>
       {data ? (
@@ -147,6 +231,56 @@ function AdminStore() {
               </BottomDashBox>
             </DashBox>
           </DashContainer>
+          <ChartContainer>
+            <DashBox>
+              <UpperDashBox>
+                <h1>랜딩페이지1</h1>
+                <span></span>
+              </UpperDashBox>
+              <ChartBox>
+                <Chart
+                  options={option.options}
+                  series={data?.seeDashBoard.chart1Object}
+                  width="330"
+                  type="area"
+                ></Chart>
+              </ChartBox>
+              <ChartBottomBox>
+                <span></span>
+                <span>
+                  {(data?.seeDashBoard.landing1TotalPurchase)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  건/주
+                </span>
+              </ChartBottomBox>
+            </DashBox>
+            <DashBox>
+              <UpperDashBox>
+                <h1>랜딩페이지2</h1>
+                <span></span>
+              </UpperDashBox>
+              <ChartBox>
+                {" "}
+                <Chart
+                  options={option.options}
+                  series={data?.seeDashBoard.chart2Object}
+                  width="330"
+                  type="area"
+                ></Chart>
+              </ChartBox>
+              <ChartBottomBox>
+                <span></span>
+
+                <span>
+                  {(data?.seeDashBoard.landing2TotalPurchase)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  건/주
+                </span>
+              </ChartBottomBox>
+            </DashBox>
+          </ChartContainer>
         </Base>
       ) : null}
     </>

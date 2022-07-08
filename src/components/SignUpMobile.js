@@ -3,18 +3,22 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import AuthLayout from "./auth/AuthLayout";
 import PageTitle from "./pageTitle";
+import { useParams } from "react-router-dom";
+
 import { ToastContainer, toast } from "react-toastify";
 import MobileError from "./auth/MobileError";
-import { FlexBox } from "./shared";
+import { FlexBox, HiddenInput } from "./shared";
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccount(
+    $productId: Int
     $firstName: String!
     $phone: String!
     $age: String!
     $orderMethod: String!
   ) {
     createAccount(
+      productId: $productId
       firstName: $firstName
       phone: $phone
       age: $age
@@ -115,6 +119,8 @@ const HiddenSelect = styled.select`
 `;
 
 function SignUpMobile() {
+  const { id } = useParams();
+
   const onCompleted = (data) => {
     const {
       createAccount: { ok, error },
@@ -140,12 +146,14 @@ function SignUpMobile() {
     }
 
     data.phone = data.phone1 + data.phone2 + data.phone3;
+    data.productId = parseInt(data.productId);
+    console.log(data);
+
     createAccount({
       variables: {
         ...data,
       },
     });
-    console.log(" ");
 
     alert(
       "신청이 완료되었습니다😀 영업일 기준 1~2일 내에 연락드리겠습니다📞 감사합니다🙌"
@@ -170,6 +178,13 @@ function SignUpMobile() {
                   id="inputName"
                 />
               </InputComp>
+              <HiddenInput
+                ref={register()}
+                name="productId"
+                defaultValue={parseInt(id)}
+                type="text"
+                placeholder="아이디"
+              ></HiddenInput>
 
               <InputComp>
                 <span>번호</span>

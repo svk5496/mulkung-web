@@ -18,14 +18,11 @@ const Content = styled.main`
 
 const SubjectContainer = styled.div`
   width: auto;
-
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: solid 1px ${(props) => props.theme.bgGray};
-  span {
-  }
   label {
     cursor: pointer;
   }
@@ -183,13 +180,9 @@ function OrderPaidList({ data }) {
               <span>결제 완료 주문</span>
             </label>
             <ButtonContainer>
-              <PlaceOrderBt>
-                <span></span>
-              </PlaceOrderBt>
-
-              {/* <DeleteBt onClick={deleteBt}>
-                <span></span>
-              </DeleteBt> */}
+              <DeleteBt onClick={deleteBt}>
+                <span>삭제</span>
+              </DeleteBt>
             </ButtonContainer>
           </SubjectContainer>
           <UserContainer>

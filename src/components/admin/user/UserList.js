@@ -16,7 +16,9 @@ const Content = styled.main`
 
 const SubjectContainer = styled.div`
   width: auto;
-
+  max-width: 1200px;
+  min-width: 700px;
+  padding-right: 40px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -90,14 +92,18 @@ const DeleteBt = styled(PlaceOrderBt)`
 
 const UserInfo = styled.div`
   display: flex;
-  width: 56vw;
-
+  width: 75vw;
+  max-width: 1200px;
+  min-width: 700px;
   justify-content: space-between;
+  span {
+    width: 120px;
+  }
 `;
 
-const DELETE_PRODUCT_MUTATION = gql`
-  mutation deleteProduct($id: Int!) {
-    deleteProduct(id: $id) {
+const DELETE_USER_MUTATION = gql`
+  mutation deleteUser($id: Int!) {
+    deleteUser(id: $id) {
       ok
       error
     }
@@ -146,13 +152,13 @@ function UserList({ data }) {
     }
   };
 
-  const [deleteProduct, { loading }] = useMutation(DELETE_PRODUCT_MUTATION, {
+  const [deleteUser, { loading }] = useMutation(DELETE_USER_MUTATION, {
     onCompleted,
   });
 
   const deleteBt = () => {
     for (let i = 0; i < checkedList.length; i++) {
-      deleteProduct({
+      deleteUser({
         variables: {
           id: checkedList[i].id,
         },
@@ -165,7 +171,6 @@ function UserList({ data }) {
       alert("삭제할 항목을 먼저 눌러주세요");
     }
   };
-  console.log(data);
 
   return (
     <Content>
@@ -174,7 +179,7 @@ function UserList({ data }) {
           <ButtonContainer>
             <Link to={routes.adminProductNew}>
               <PlaceOrderBt>
-                <span>신규 상품 등록</span>
+                <span>신규 고객 등록</span>
               </PlaceOrderBt>
             </Link>
 
@@ -199,7 +204,7 @@ function UserList({ data }) {
             </label>
             <span>이름</span>
             <span>구매횟수</span>
-            <span></span>
+            <span>핸드폰번호</span>
           </SubjectContainer>
 
           <UserContainer>
@@ -221,6 +226,12 @@ function UserList({ data }) {
                         <span>{user.id}</span>
                         <span>{user.firstName}</span>
                         <span>{user.totalPurchase}</span>
+                        <span>
+                          {user.phone.replace(
+                            /(^02.{0}|^01.{1}|^[0-9]{3})([0-9]*)([0-9]{4})/,
+                            "$1--$2--$3"
+                          )}
+                        </span>
                       </UserInfo>
                     </Link>
                   </UserRow>

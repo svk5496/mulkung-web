@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import AuthButton from "./auth/AuthButton";
 import AuthFormBox from "./auth/AuthFormBox";
@@ -9,15 +10,18 @@ import AuthSelect from "./auth/AuthSelect";
 import FormError from "./auth/FormError";
 import PageTitle from "./pageTitle";
 import { ToastContainer, toast } from "react-toastify";
+import { HiddenInput } from "./shared";
 
 const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccount(
+    $productId: Int
     $firstName: String!
     $phone: String
     $age: String
     $orderMethod: String
   ) {
     createAccount(
+      productId: $productId
       firstName: $firstName
       phone: $phone
       age: $age
@@ -48,6 +52,8 @@ const HiddenSelect = styled.select`
 `;
 
 function SignUpPc() {
+  const { id } = useParams();
+
   const onCompleted = (data) => {
     const {
       createAccount: { ok, error },
@@ -71,20 +77,18 @@ function SignUpPc() {
     if (loading) {
       return;
     }
+    data.productId = parseInt(data.productId);
     createAccount({
       variables: {
         ...data,
       },
     });
+    console.log(data);
 
-    toast.success("신청이 완료되었습니다", {
-      autoClose: 2000,
-      position: toast.POSITION.TOP_CENTER,
-    });
-    inputName.value = null;
-    inputPhone.value = null;
-    inputAge.value = null;
-    okBt.style.opacity = 0.5;
+    alert(
+      "신청이 완료되었습니다😀 영업일 기준 1~2일 내에 연락드리겠습니다📞 감사합니다🙌"
+    );
+    window.location.reload();
   };
 
   return (
@@ -103,6 +107,13 @@ function SignUpPc() {
             id="inputName"
           />
           <FormError message={errors?.firstName?.message}></FormError>
+          <HiddenInput
+            ref={register()}
+            name="productId"
+            defaultValue={parseInt(id)}
+            type="text"
+            placeholder="아이디"
+          ></HiddenInput>
           <AuthInput
             ref={register({
               required: "전화번호를 입력해주세요",

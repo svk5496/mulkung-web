@@ -117,8 +117,6 @@ function Product() {
     },
   });
 
-  console.log(data);
-
   function createDetail1() {
     return { __html: data?.seeDetail?.detailPage1 };
   }

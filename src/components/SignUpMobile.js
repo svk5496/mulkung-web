@@ -135,10 +135,6 @@ function SignUpMobile() {
   const { register, handleSubmit, errors, formState, getValues } = useForm({
     mode: "onChange",
   });
-  const inputName = document.getElementById("inputName");
-  const inputPhone = document.getElementById("inputPhone");
-  const inputAge = document.getElementById("inputAge");
-  const okBt = document.getElementById("okBt");
 
   const onSubmitValid = (data) => {
     if (loading) {
@@ -147,17 +143,16 @@ function SignUpMobile() {
 
     data.phone = data.phone1 + data.phone2 + data.phone3;
     data.productId = parseInt(data.productId);
-    console.log(data);
 
     createAccount({
       variables: {
         ...data,
       },
     });
-
     alert(
       "신청이 완료되었습니다😀 영업일 기준 1~2일 내에 연락드리겠습니다📞 감사합니다🙌"
     );
+
     window.location.reload();
   };
 
@@ -181,7 +176,7 @@ function SignUpMobile() {
               <HiddenInput
                 ref={register()}
                 name="productId"
-                defaultValue={parseInt(id)}
+                defaultValue={id}
                 type="text"
                 placeholder="아이디"
               ></HiddenInput>
@@ -232,9 +227,7 @@ function SignUpMobile() {
               </InputComp>
 
               <HiddenSelect name="orderMethod" ref={register({})}>
-                <option value="phone" defaultValue>
-                  전화로 상담받기
-                </option>
+                <option value="phone">전화로 상담받기</option>
                 <option value="chat">채팅으로 상담받기</option>
               </HiddenSelect>
             </InputContainer>

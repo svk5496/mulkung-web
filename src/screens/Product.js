@@ -116,8 +116,9 @@ function Product() {
       id: parseInt(id),
     },
   });
-  const detail1 = data?.seeDetail.detailPage1;
-  const detail2 = data?.seeDetail.detailPage2;
+
+  const detail1 = data?.seeDetail?.detailPage1;
+  const detail2 = data?.seeDetail?.detailPage2;
 
   function createDetail1() {
     return { __html: detail1 };

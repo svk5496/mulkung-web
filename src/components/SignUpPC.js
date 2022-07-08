@@ -83,12 +83,12 @@ function SignUpPc() {
         ...data,
       },
     });
-    console.log(data);
-
     alert(
       "신청이 완료되었습니다😀 영업일 기준 1~2일 내에 연락드리겠습니다📞 감사합니다🙌"
     );
-    window.location.reload();
+    inputName.value = "";
+    inputAge.value = "";
+    inputPhone.value = "";
   };
 
   return (

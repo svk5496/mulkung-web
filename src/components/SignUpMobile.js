@@ -154,6 +154,18 @@ function SignUpMobile() {
     );
 
     console.log(data);
+    const inputName = document.getElementById("inputName");
+    const inputPhone1 = document.getElementById("inputPhone1");
+    const inputPhone2 = document.getElementById("inputPhone2");
+    const inputPhone3 = document.getElementById("inputPhone3");
+    const inputAge = document.getElementById("inputAge");
+    const okBt = document.getElementById("okBt");
+
+    inputName.value = "";
+    inputAge.value = "";
+    inputPhone1.value = "";
+    inputPhone2.value = "";
+    inputPhone3.value = "";
 
     //window.location.reload();
   };

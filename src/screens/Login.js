@@ -126,8 +126,8 @@ function Login() {
         </FacebookLogin>
       </AuthFormBox>
       <AuthBottomBox
-        cta="Don't have an account"
-        linkText="Sign up"
+        cta="계정이 없으신가요?"
+        linkText="계정 만들기"
         link={routes.signUp}
       ></AuthBottomBox>
     </AuthLayout>

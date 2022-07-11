@@ -203,7 +203,7 @@ function SignUpMobile() {
                       required: "전화번호를 입력해주세요",
                     })}
                     name="phone1"
-                    type="text"
+                    type="number"
                     id="inputPhone1"
                     maxLength={3}
                   />
@@ -212,7 +212,7 @@ function SignUpMobile() {
                       required: "전화번호를 입력해주세요",
                     })}
                     name="phone2"
-                    type="text"
+                    type="number"
                     id="inputPhone2"
                     maxLength={4}
                   />
@@ -221,7 +221,7 @@ function SignUpMobile() {
                       required: "전화번호를 입력해주세요",
                     })}
                     name="phone3"
-                    type="text"
+                    type="number"
                     id="inputPhone3"
                     maxLength={4}
                   />

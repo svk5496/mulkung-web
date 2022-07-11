@@ -286,9 +286,6 @@ function PaidOrder() {
   let creditCard = "";
   let cvcNumber = "";
 
-  console.log("card number : " + data?.seeOrderDetail?.user?.creditCard);
-  console.log("key: " + process.env.REACT_APP_CRYPTO_JS_KEY);
-
   if (data) {
     const key = process.env.REACT_APP_CRYPTO_JS_KEY;
     const iv = process.env.REACT_APP_CRYPTO_JS_SALT;

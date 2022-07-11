@@ -18,6 +18,7 @@ import routes from "../routes";
 const CREATE_ORDER_MUTATION = gql`
   mutation createOrder(
     $firstName: String!
+    $age: String
     $phone: String!
     $status: String!
     $orderMethod: String!
@@ -33,6 +34,7 @@ const CREATE_ORDER_MUTATION = gql`
   ) {
     createOrder(
       firstName: $firstName
+      age: $age
       phone: $phone
       status: $status
       orderMethod: $orderMethod
@@ -280,7 +282,7 @@ function CreateOrder() {
           },
         });
       }
-    }, 1000);
+    }, 2000);
 
     alert("저장이 완료되었습니다.");
 

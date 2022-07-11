@@ -225,7 +225,7 @@ function AdminStore() {
                 <span>{data.seeDashBoard.countRefunds}</span>
               </MiddleDashBox>
               <BottomDashBox>
-                <Link to={routes.adminOrderSent}>
+                <Link to={routes.adminOrderReturned}>
                   <span>See all Refunds</span>
                 </Link>
               </BottomDashBox>

@@ -162,10 +162,6 @@ function Product() {
               <ProductDetail1
                 dangerouslySetInnerHTML={createDetail1()}
               ></ProductDetail1>
-
-              <ProductDetail2
-                dangerouslySetInnerHTML={createDetail2()}
-              ></ProductDetail2>
             </ProductDetailContainer>
             <ToastContainer></ToastContainer>
 

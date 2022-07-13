@@ -34,6 +34,25 @@ const ProductInput = styled.input`
   -webkit-appearance: none;
 `;
 
+const ProductSelect = styled.select`
+  width: 100%;
+  height: 38px;
+  border-radius: 2px;
+  padding: 7px 20px;
+  background-color: white;
+  border: 0.5px solid
+    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
+  margin-top: 5px;
+  box-sizing: border-box;
+  &::placeholder {
+    font-size: 12px;
+  }
+  &:focus {
+    border-color: ${(props) => props.theme.primary};
+  }
+  -webkit-appearance: none;
+`;
+
 const InputName = styled.span`
   display: flex;
   width: 100px;
@@ -83,20 +102,18 @@ const EDIT_PRODUCT_MUTATION = gql`
     $id: Int!
     $productName: String!
     $price: Int!
+    $adName: String!
+    $packageName: String!
     $detailPage1: String!
-    $detailPage2: String!
-    $color: String
-    $size: String
     $productSliderPicture: String
   ) {
-    editProduct(
+    uploadProduct(
       id: $id
       productName: $productName
       price: $price
+      adName: $adName
+      packageName: $packageName
       detailPage1: $detailPage1
-      detailPage2: $detailPage2
-      color: $color
-      size: $size
       productSliderPicture: $productSliderPicture
     ) {
       ok
@@ -160,14 +177,16 @@ function EditLayout() {
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <InputContainer>
             <InputName>상품명</InputName>
-
-            <ProductInput
-              ref={register()}
+            <ProductSelect
+              ref={register({ required: "상품명을 입력해주세요" })}
               name="productName"
-              defaultValue={data?.seeProductDetail.productName}
               type="text"
               placeholder="상품명"
-            ></ProductInput>
+            >
+              <option>물컹슈즈</option>
+              <option>벌집1</option>
+              <option>벌집2</option>
+            </ProductSelect>
           </InputContainer>
           <HiddenInput
             ref={register()}
@@ -176,61 +195,59 @@ function EditLayout() {
             type="text"
             placeholder="아이디"
           ></HiddenInput>
+
           <InputContainer>
             <InputName>가격</InputName>
-            <ProductInput
-              ref={register()}
+            <ProductSelect
+              ref={register({ required: "가격" })}
               name="price"
-              defaultValue={data?.seeProductDetail.price}
               type="text"
               placeholder="가격"
+            >
+              <option>79000</option>
+              <option>129000</option>
+            </ProductSelect>
+          </InputContainer>
+          <InputContainer>
+            <InputName>광고 소재 이름</InputName>
+            <ProductInput
+              ref={register({ required: "광고 소재" })}
+              name="adName"
+              type="text"
+              placeholder="광고 소재 이름"
             ></ProductInput>
           </InputContainer>
           <InputContainer>
-            <InputName>페이지1</InputName>
+            <InputName>패키지 이름</InputName>
+            <ProductSelect
+              ref={register({ required: "패키지 이름" })}
+              name="packageName"
+              type="text"
+            >
+              <option>kakao</option>
+              <option>naver</option>
+              <option>instagram</option>
+              <option>facebook</option>
+              <option>google</option>
+            </ProductSelect>
+          </InputContainer>
+          <InputContainer>
+            <InputName>페이지(HTML)</InputName>
             <ProductInput
-              ref={register()}
+              ref={register({ required: "페이지1" })}
               name="detailPage1"
-              defaultValue={data?.seeProductDetail.detailPage1}
               type="text"
               placeholder="HTML"
             ></ProductInput>
           </InputContainer>
           <InputContainer>
-            <InputName>페이지2</InputName>
-            <ProductInput
-              ref={register()}
-              name="detailPage2"
-              defaultValue={data?.seeProductDetail.detailPage2}
-              type="text"
-              placeholder="HTML"
-            ></ProductInput>
-          </InputContainer>
-          <InputContainer>
-            <InputName>컬러</InputName>
-            <ProductInput
-              ref={register()}
-              name="color"
-              type="text"
-              placeholder=",로 구분(optional)"
-            ></ProductInput>
-          </InputContainer>
-          <InputContainer>
-            <InputName>사이즈</InputName>
-            <ProductInput
-              ref={register()}
-              name="size"
-              type="text"
-              placeholder=",로 구분(optional)"
-            ></ProductInput>
-          </InputContainer>
-          <InputContainer>
-            <InputName>사진</InputName>
+            <InputName>PC사진</InputName>
             <ProductInput
               ref={register()}
               name="productSliderPicture"
               type="text"
               placeholder=",로 구분(optional)"
+              defaultValue="http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung1.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung2.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung3.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung4.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung5.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung6.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung7.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung8.png,"
             ></ProductInput>
           </InputContainer>
           <AuthButton type="submit" value="수정하기" />

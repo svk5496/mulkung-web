@@ -110,7 +110,7 @@ function AdminHeader() {
             <Menu>
               <BsBoxSeam size="18"></BsBoxSeam>
 
-              <span>상품관리</span>
+              <span>페이지관리</span>
             </Menu>
           </Link>
           <Link to={routes.adminOrderNew}>

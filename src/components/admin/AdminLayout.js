@@ -28,7 +28,7 @@ const AdminBox = styled.div`
 
 const HeaderArea = styled.div`
   width: 14%;
-  min-width: 200px;
+  min-width: 210px;
   box-shadow: 5px 6px 30px rgba(211, 227, 67, 0.4);
 `;
 

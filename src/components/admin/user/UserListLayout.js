@@ -7,6 +7,18 @@ import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import UserList from "./UserList";
 import Pagination from "react-js-pagination";
 import "bootstrap/dist/css/bootstrap.css";
+import { PaginationBox } from "../../shared";
+import {
+  beforeEntire,
+  beforeHalf,
+  beforeMonth,
+  beforeQuarter,
+  beforeWeek,
+  beforeYear,
+  myEndDate,
+  myStartDate,
+  week,
+} from "../../sharedFunction";
 
 const Layer = styled.div`
   width: 100%;
@@ -71,53 +83,6 @@ const SearchBt = styled.input`
   text-align: center;
   :hover {
     cursor: pointer;
-  }
-`;
-
-const PaginationBox = styled.div`
-  .pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  ul.pagination li {
-    display: inline-block;
-    margin: 0px 5px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1rem;
-  }
-  ul.pagination li:first-child {
-    border-radius: 5px 0 0 5px;
-  }
-  ul.pagination li:last-child {
-    border-radius: 0 5px 5px 0;
-  }
-  ul.pagination li a {
-    text-decoration: none;
-    color: green;
-    font-size: 1rem;
-  }
-  ul.pagination li.active a {
-    color: white;
-  }
-  ul.pagination li.active {
-    background-color: ${(props) => props.theme.secondary};
-    border-radius: 20px;
-  }
-  ul.pagination li a:hover,
-  ul.pagination li a.active {
-    color: green;
-  }
-  a {
-    text-decoration: none;
   }
 `;
 

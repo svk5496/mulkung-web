@@ -10,6 +10,7 @@ import routes from "../../../screens/routes";
 
 const Content = styled.main`
   display: flex;
+
   flex-direction: column;
   padding: 0px 20px;
   margin-right: 30px;
@@ -66,6 +67,7 @@ const UserRow = styled.div`
   a {
     text-decoration: none;
     color: inherit;
+    width: 100%;
   }
 `;
 
@@ -86,27 +88,31 @@ const PlaceOrderBt = styled.div`
   margin-right: 10px;
 `;
 
-const DeleteBt = styled(PlaceOrderBt)`
+const InActiveBt = styled(PlaceOrderBt)`
   background-color: tomato;
+`;
+
+const ActiveBt = styled(PlaceOrderBt)`
+  background-color: skyblue;
 `;
 
 const UserInfo = styled.div`
   display: flex;
-  width: 56vw;
+  width: 100%;
 
   justify-content: space-between;
 `;
 
-const DELETE_PRODUCT_MUTATION = gql`
-  mutation deleteProduct($id: Int!) {
-    deleteProduct(id: $id) {
+const ACTIVE_PRODUCT_MUTATION = gql`
+  mutation activeProduct($id: Int!, $isActive: String!) {
+    activeProduct(id: $id, isActive: $isActive) {
       ok
       error
     }
   }
 `;
 
-function ProductList({ data }) {
+function ProductList({ data, isActive }) {
   const [checkedList, setCheckedList] = useState([]);
 
   const dataList = [];
@@ -141,30 +147,48 @@ function ProductList({ data }) {
 
   const onCompleted = (data) => {
     const {
-      deleteProduct: { ok, error },
+      activeProduct: { ok, error },
     } = data;
     if (!ok) {
       return;
     }
   };
 
-  const [deleteProduct, { loading }] = useMutation(DELETE_PRODUCT_MUTATION, {
+  const [activeProduct, { loading }] = useMutation(ACTIVE_PRODUCT_MUTATION, {
     onCompleted,
   });
 
-  const deleteBt = () => {
+  const inActiveBt = () => {
     for (let i = 0; i < checkedList.length; i++) {
-      deleteProduct({
+      activeProduct({
         variables: {
           id: checkedList[i].id,
+          isActive: "inActive",
         },
       });
     }
     if (checkedList.length > 0) {
-      alert("삭제가 완료되었습니다.");
+      alert("비활성화가 완료되었습니다.");
       window.location.reload();
     } else {
-      alert("삭제할 항목을 먼저 눌러주세요");
+      alert("체크박스를 먼저 눌러주세요");
+    }
+  };
+
+  const activeBt = () => {
+    for (let i = 0; i < checkedList.length; i++) {
+      activeProduct({
+        variables: {
+          id: checkedList[i].id,
+          isActive: "active",
+        },
+      });
+    }
+    if (checkedList.length > 0) {
+      alert("활성화가 완료되었습니다.");
+      window.location.reload();
+    } else {
+      alert("체크박스를 먼저 눌러주세요");
     }
   };
 
@@ -178,10 +202,15 @@ function ProductList({ data }) {
                 <span>신규 상품 등록</span>
               </PlaceOrderBt>
             </Link>
-
-            {/* <DeleteBt onClick={deleteBt}>
-              <span>삭제</span>
-            </DeleteBt> */}
+            {isActive === "active" ? (
+              <InActiveBt onClick={inActiveBt}>
+                <span>비활성화</span>
+              </InActiveBt>
+            ) : (
+              <ActiveBt onClick={activeBt}>
+                <span>활성화</span>
+              </ActiveBt>
+            )}
           </ButtonContainer>
           <SubjectContainer>
             <label>
@@ -198,8 +227,9 @@ function ProductList({ data }) {
               ></input>
               <span>id</span>
             </label>
-            <span>상품명</span>
+            <span>소재이름</span>
             <span>가격</span>
+            <span>판매량</span>
             <span></span>
           </SubjectContainer>
 
@@ -220,15 +250,17 @@ function ProductList({ data }) {
                     <Link to={`/rhksflwkdjemals/product/edit/${product.id}`}>
                       <UserInfo>
                         <span>{product.id}</span>
-                        <span>{product.productName}</span>
+                        <span>{product.adName}</span>
                         <span>{product.price}</span>
+                        <span>{product.totalOrderAmount}</span>
+                        <span></span>
                       </UserInfo>
                     </Link>
                   </UserRow>
                 ))}
               </div>
             ) : (
-              <div>새로운 신규주문이 없습니다 </div>
+              <div>조회된 페이지가 없습니다.</div>
             )}
           </UserContainer>
         </div>

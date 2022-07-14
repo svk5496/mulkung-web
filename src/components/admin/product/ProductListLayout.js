@@ -37,7 +37,7 @@ const H1 = styled.span`
 const SearchBarBox = styled.div`
   width: 100%;
   margin-left: 20px;
-  height: 10%;
+  height: 60%;
 `;
 
 const SearchContent = styled.div`
@@ -46,6 +46,13 @@ const SearchContent = styled.div`
   display: flex;
   justify-content: end;
   align-items: center;
+`;
+
+const FilterBox = styled.div`
+  display: flex;
+
+  justify-content: end;
+  padding-right: 30px;
 `;
 
 const SearchInput = styled.input`
@@ -71,30 +78,70 @@ const SearchBt = styled.input`
   }
 `;
 
+const ProductSelect = styled.select`
+  width: 100%;
+  height: 34px;
+  border-radius: 0px;
+  padding: 6px 20px;
+  background-color: white;
+  border: 2px solid ${(props) => props.theme.primary};
+  margin-top: 4px;
+  box-sizing: border-box;
+  &::placeholder {
+    font-size: 12px;
+  }
+  &:focus {
+    border-color: ${(props) => props.theme.primary};
+  }
+  -webkit-appearance: none;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  width: 20%;
+  justify-content: center;
+  align-items: center;
+`;
+
 const SEE_PRODUCTS_QUERY = gql`
-  query seeProducts($productName: String) {
-    seeProducts(productName: $productName) {
+  query seeProducts($adName: String, $isActive: String, $packageName: String) {
+    seeProducts(
+      adName: $adName
+      isActive: $isActive
+      packageName: $packageName
+    ) {
       id
-      productName
+      adName
       price
+      totalOrderAmount
     }
   }
 `;
 
 function ProductListLayout() {
-  const [name, setName] = useState("");
+  const [adName, setAdName] = useState("");
+  const [isActive, setIsActive] = useState("active");
+  const [packageName, setPackageName] = useState("all");
 
   const { register, handleSubmit, formState } = useForm();
 
   const { data } = useQuery(SEE_PRODUCTS_QUERY, {
     variables: {
-      productName: name,
+      isActive,
+      adName,
+      packageName,
     },
   });
 
   const handleBt = () => {
     const productName = document.getElementById("productNameIp");
-    setName(productName.value);
+    setAdName(productName.value);
+  };
+  const isActveBt = (e) => {
+    setIsActive(e.target.value);
+  };
+  const packageBt = (e) => {
+    setPackageName(e.target.value);
   };
 
   return (
@@ -102,15 +149,41 @@ function ProductListLayout() {
       <Layer>
         <Container>
           <HeaderBox>
-            <H1>Product</H1>
+            <H1>Pages</H1>
             <SearchBarBox>
               <form onSubmit={handleSubmit()}>
+                <FilterBox>
+                  <InputContainer>
+                    <ProductSelect
+                      ref={register({ required: "패키지이름" })}
+                      name="packageName"
+                      onChange={packageBt}
+                    >
+                      <option value="all">모든플랫폼</option>
+                      <option value="kakao">카카오</option>
+                      <option value="naver">네이버</option>
+                      <option value="google">구글</option>
+                      <option value="facebook">페이스북</option>
+                      <option value="instagram">인스타그램</option>
+                    </ProductSelect>
+                  </InputContainer>
+                  <InputContainer>
+                    <ProductSelect
+                      ref={register({ required: "활성 비활성" })}
+                      name="isActive"
+                      onChange={isActveBt}
+                    >
+                      <option value="active">광고중</option>
+                      <option value="inActive">광고중지</option>
+                    </ProductSelect>
+                  </InputContainer>
+                </FilterBox>
                 <SearchContent>
                   <SearchInput
                     ref={register({ required: false })}
-                    name="productName"
+                    name="adName"
                     type="text"
-                    placeholder="상품명을 입력하세요"
+                    placeholder="광고 소재를 입력하세요"
                     id="productNameIp"
                   ></SearchInput>
                   <SearchBt readOnly onClick={handleBt} value="검색"></SearchBt>
@@ -120,7 +193,7 @@ function ProductListLayout() {
           </HeaderBox>
 
           {/* 컨텐트 시작 */}
-          <ProductList data={data}></ProductList>
+          <ProductList data={data} isActive={isActive}></ProductList>
         </Container>
       </Layer>
     </>

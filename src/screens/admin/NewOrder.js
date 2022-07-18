@@ -33,6 +33,7 @@ const SEE_ORDER_DETAIL_QUERY = gql`
         firstName
         phone
         age
+        gender
         creditCard
         expireDate
         cvcNumber
@@ -55,6 +56,8 @@ const SEE_ORDER_DETAIL_QUERY = gql`
 const EDIT_NEW_ORDER_MUTATION = gql`
   mutation editNewOrder(
     $id: Int!
+    $age: String
+    $gender: String!
     $status: String!
     $addressName: String!
     $shippingName: String!
@@ -68,6 +71,8 @@ const EDIT_NEW_ORDER_MUTATION = gql`
   ) {
     editNewOrder(
       id: $id
+      age: $age
+      gender: $gender
       status: $status
       addressName: $addressName
       shippingName: $shippingName
@@ -144,6 +149,25 @@ const ProductItem = styled.div`
   height: 40px;
   padding: 30px 20px;
   border-bottom: 1px solid lightgray;
+`;
+
+const ProductSelect = styled.select`
+  width: 100%;
+  height: 38px;
+  border-radius: 2px;
+  padding: 7px 20px;
+  background-color: white;
+  border: 0.5px solid
+    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
+  margin-top: 5px;
+  box-sizing: border-box;
+  &::placeholder {
+    font-size: 12px;
+  }
+  &:focus {
+    border-color: ${(props) => props.theme.primary};
+  }
+  -webkit-appearance: none;
 `;
 
 const ProductHeader = styled.div`
@@ -301,6 +325,11 @@ function NewOrder() {
       data.productId = 1;
       data.orderId = parseInt(data.id);
 
+      if (data.gender === "선택") {
+        alert("성별을 선택해주세요");
+        return null;
+      }
+
       createOrderItem({
         variables: {
           ...data,
@@ -362,6 +391,14 @@ function NewOrder() {
                 type="text"
                 placeholder="나이"
               ></StyledInput>
+            </InputBox>
+            <InputBox>
+              <span>성별</span>
+              <ProductSelect ref={register({ required: "성별" })} name="gender">
+                <option>선택</option>
+                <option>여자</option>
+                <option>남자</option>
+              </ProductSelect>
             </InputBox>
           </InfoBox>
           <InfoBox>

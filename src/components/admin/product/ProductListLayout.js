@@ -81,10 +81,10 @@ const SearchBt = styled.input`
 const ProductSelect = styled.select`
   width: 100%;
   height: 34px;
-  border-radius: 0px;
+  border-radius: 4px;
   padding: 6px 20px;
   background-color: white;
-  border: 2px solid ${(props) => props.theme.primary};
+  border: 1px solid ${(props) => props.theme.borderColor};
   margin-top: 4px;
   box-sizing: border-box;
   &::placeholder {

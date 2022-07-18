@@ -130,7 +130,7 @@ const EDIT_PRODUCT_MUTATION = gql`
     $detailPage1: String!
     $productSliderPicture: String
   ) {
-    uploadProduct(
+    editProduct(
       id: $id
       productName: $productName
       price: $price

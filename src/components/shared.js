@@ -49,6 +49,36 @@ export const Checkbox = styled.input`
   accent-color: ${(props) => props.theme.secondary};
 `;
 
+export const RowFlexBox = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+  span {
+    margin: 10px;
+  }
+`;
+
+export const StyledSelect = styled.select`
+  width: 100%;
+  height: 38px;
+  border-radius: 2px;
+  padding: 7px 20px;
+  background-color: white;
+  border: 0.5px solid
+    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
+  margin-top: 5px;
+  box-sizing: border-box;
+  &::placeholder {
+    font-size: 12px;
+  }
+  &:focus {
+    border-color: ${(props) => props.theme.primary};
+  }
+  -webkit-appearance: none;
+`;
+
 export const StyledInput = styled.input`
   width: 100%;
   border-radius: 2px;

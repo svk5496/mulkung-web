@@ -6,18 +6,22 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import routes from "../../../screens/routes";
 
-const Content = styled.main`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0px 20px;
   margin-right: 30px;
+  padding-top: 30px;
   width: 100%;
 `;
 
+const Base = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
 const SubjectContainer = styled.div`
-  width: auto;
-  max-width: 1200px;
-  min-width: 700px;
+  width: 100%;
   padding-right: 40px;
   height: 40px;
   display: flex;
@@ -66,6 +70,7 @@ const UserRow = styled.div`
   a {
     text-decoration: none;
     color: inherit;
+    width: 100%;
   }
 `;
 
@@ -92,9 +97,7 @@ const DeleteBt = styled(PlaceOrderBt)`
 
 const UserInfo = styled.div`
   display: flex;
-  width: 75vw;
-  max-width: 1200px;
-  min-width: 700px;
+  width: 100%;
   justify-content: space-between;
   span {
     width: 120px;
@@ -175,7 +178,9 @@ function UserList({ data }) {
   return (
     <Content>
       {loading ? null : (
-        <div>
+        <Base>
+          <span>총 {data?.seeUsers?.totalUsers}명</span>
+
           <ButtonContainer>
             <Link to={routes.adminProductNew}>
               <PlaceOrderBt>
@@ -241,7 +246,7 @@ function UserList({ data }) {
               <div>데이터가 없습니다</div>
             )}
           </UserContainer>
-        </div>
+        </Base>
       )}
     </Content>
   );

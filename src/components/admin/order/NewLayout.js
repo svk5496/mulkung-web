@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/esm/locale";
 import { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { HiddenInput } from "../../shared";
+import { HiddenInput, RowFlexBox } from "../../shared";
 import {
   beforeEntire,
   beforeHalf,
@@ -69,17 +69,6 @@ const SearchDateContainer = styled.div`
   width: 100%;
   height: 140px;
   margin-top: 10px;
-`;
-
-export const RowFlexBox = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 4px;
-  span {
-    margin: 10px;
-  }
 `;
 
 const DateInputBox = styled.div`

@@ -28,8 +28,8 @@ export const beforeWeek = new Date(
 
 export const beforeMonth = new Date(
   today.getFullYear(),
-  today.getMonth(),
-  today.getDate() - 7,
+  today.getMonth() - 1,
+  today.getDate(),
   0,
   0,
   0

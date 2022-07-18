@@ -4,11 +4,19 @@ import { useForm } from "react-hook-form";
 import AuthButton from "../../auth/AuthButton";
 import { useParams } from "react-router-dom";
 import { HiddenInput } from "../../shared";
+import { useState } from "react";
 
 const UploadContainer = styled.div`
   padding-top: 40px;
   width: 100%;
   height: 100%;
+`;
+
+const Header = styled.div`
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+  align-items: baseline;
 `;
 
 const Subtitle = styled.span`
@@ -82,12 +90,27 @@ const UploadFormBox = styled.div`
   }
 `;
 
+const EditModeBt = styled.div`
+  display: flex;
+  padding: 10px 20px;
+  margin-right: 30px;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid ${(props) => props.theme.borderColor};
+  :hover {
+    cursor: pointer;
+  }
+`;
+
 const SEE_PRODUCT_DETAIL_QUERY = gql`
   query seeProductDetail($id: Int!) {
     seeProductDetail(id: $id) {
       id
       productName
       price
+      adName
+      packageName
       detailPage1
       detailPage2
       productSliderPictures {
@@ -136,14 +159,11 @@ function EditLayout() {
   };
 
   const { id } = useParams();
-
   const { _, data } = useQuery(SEE_PRODUCT_DETAIL_QUERY, {
     variables: {
       id: parseInt(id),
     },
   });
-
-  console.log(data);
 
   const [editProduct, { loading }] = useMutation(EDIT_PRODUCT_MUTATION, {
     onCompleted,
@@ -170,89 +190,108 @@ function EditLayout() {
       },
     });
   };
+  console.log(data);
+
+  const [editMode, setEditMode] = useState(false);
+
   return (
     <UploadContainer>
-      <Subtitle>상품수정</Subtitle>
-      <UploadFormBox>
-        <form onSubmit={handleSubmit(onSubmitValid)}>
-          <InputContainer>
-            <InputName>상품명</InputName>
-            <ProductSelect
-              ref={register({ required: "상품명을 입력해주세요" })}
-              name="productName"
-              type="text"
-              placeholder="상품명"
-            >
-              <option>물컹슈즈</option>
-              <option>벌집1</option>
-              <option>벌집2</option>
-            </ProductSelect>
-          </InputContainer>
-          <HiddenInput
-            ref={register()}
-            name="id"
-            defaultValue={parseInt(id)}
-            type="text"
-            placeholder="아이디"
-          ></HiddenInput>
-
-          <InputContainer>
-            <InputName>가격</InputName>
-            <ProductSelect
-              ref={register({ required: "가격" })}
-              name="price"
-              type="text"
-              placeholder="가격"
-            >
-              <option>79000</option>
-              <option>129000</option>
-            </ProductSelect>
-          </InputContainer>
-          <InputContainer>
-            <InputName>광고 소재 이름</InputName>
-            <ProductInput
-              ref={register({ required: "광고 소재" })}
-              name="adName"
-              type="text"
-              placeholder="광고 소재 이름"
-            ></ProductInput>
-          </InputContainer>
-          <InputContainer>
-            <InputName>패키지 이름</InputName>
-            <ProductSelect
-              ref={register({ required: "패키지 이름" })}
-              name="packageName"
-              type="text"
-            >
-              <option>kakao</option>
-              <option>naver</option>
-              <option>instagram</option>
-              <option>facebook</option>
-              <option>google</option>
-            </ProductSelect>
-          </InputContainer>
-          <InputContainer>
-            <InputName>페이지(HTML)</InputName>
-            <ProductInput
-              ref={register({ required: "페이지1" })}
-              name="detailPage1"
-              type="text"
-              placeholder="HTML"
-            ></ProductInput>
-          </InputContainer>
-          <InputContainer>
-            <InputName>PC사진</InputName>
-            <ProductInput
+      <Header>
+        <Subtitle>페이지 정보</Subtitle>
+        <EditModeBt
+          onClick={() => {
+            setEditMode(!editMode);
+          }}
+        >
+          <span>수정하기</span>
+        </EditModeBt>
+      </Header>
+      {editMode ? (
+        <UploadFormBox>
+          <form onSubmit={handleSubmit(onSubmitValid)}>
+            <InputContainer>
+              <InputName>상품명</InputName>
+              <ProductSelect
+                ref={register({ required: "상품명을 입력해주세요" })}
+                name="productName"
+                type="text"
+                placeholder="상품명"
+              >
+                <option>물컹슈즈</option>
+                <option>벌집1</option>
+                <option>벌집2</option>
+              </ProductSelect>
+            </InputContainer>
+            <HiddenInput
               ref={register()}
-              name="productSliderPicture"
+              name="id"
+              defaultValue={parseInt(id)}
               type="text"
-              placeholder=",로 구분(optional)"
-              defaultValue="http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung1.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung2.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung3.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung4.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung5.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung6.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung7.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung8.png,"
-            ></ProductInput>
-          </InputContainer>
-          <AuthButton type="submit" value="수정하기" />
-        </form>
-      </UploadFormBox>
+              placeholder="아이디"
+            ></HiddenInput>
+
+            <InputContainer>
+              <InputName>가격</InputName>
+              <ProductSelect
+                ref={register({ required: "가격" })}
+                name="price"
+                type="text"
+                placeholder="가격"
+              >
+                <option>79000</option>
+                <option>129000</option>
+              </ProductSelect>
+            </InputContainer>
+            <InputContainer>
+              <InputName>광고 소재 이름</InputName>
+              <ProductInput
+                ref={register({ required: "광고 소재" })}
+                name="adName"
+                type="text"
+                defaultValue={data?.seeProductDetail?.adName}
+                placeholder="광고 소재 이름"
+              ></ProductInput>
+            </InputContainer>
+            <InputContainer>
+              <InputName>패키지 이름</InputName>
+              <ProductSelect
+                ref={register({ required: "패키지 이름" })}
+                name="packageName"
+                type="text"
+                key={data?.seeProductDetail?.packageName}
+                defaultValue={data?.seeProductDetail?.packageName}
+              >
+                <option>kakao</option>
+                <option>naver</option>
+                <option>instagram</option>
+                <option>facebook</option>
+                <option>google</option>
+              </ProductSelect>
+            </InputContainer>
+            <InputContainer>
+              <InputName>페이지(HTML)</InputName>
+              <ProductInput
+                ref={register({ required: "페이지1" })}
+                name="detailPage1"
+                type="text"
+                defaultValue={data?.seeProductDetail?.detailPage1}
+                placeholder="HTML"
+              ></ProductInput>
+            </InputContainer>
+            <InputContainer>
+              <InputName>PC사진</InputName>
+              <ProductInput
+                ref={register()}
+                name="productSliderPicture"
+                type="text"
+                placeholder=",로 구분(optional)"
+                defaultValue="http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung1.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung2.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung3.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung4.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung5.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung6.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung7.png, http://gi.esmplus.com/kishop1121/mulkung-web/images/mulkung8.png,"
+              ></ProductInput>
+            </InputContainer>
+            <AuthButton type="submit" value="수정하기" />
+          </form>
+        </UploadFormBox>
+      ) : null}
     </UploadContainer>
   );
 }

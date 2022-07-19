@@ -1,8 +1,8 @@
 import { gql, useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import OrderHeader from "../../components/admin/order/Header";
-import PageTitle from "../../components/pageTitle";
+import OrderHeader from "../../../components/admin/order/Header";
+import PageTitle from "../../../components/pageTitle";
 import styled from "styled-components";
 import CryptoJS from "crypto-js";
 
@@ -13,11 +13,11 @@ import {
   HiddenInput,
   StyledInput,
   SubHeader,
-} from "../../components/shared";
+} from "../../../components/shared";
 import { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 import { useHistory } from "react-router-dom";
-import routes from "../routes";
+import routes from "../../routes";
 
 const SEE_ORDER_DETAIL_QUERY = gql`
   query SeeOrderDetail($id: Int!) {
@@ -56,6 +56,7 @@ const SEE_ORDER_DETAIL_QUERY = gql`
         size
         amount
         status
+        memo
         trackingNumber
       }
     }
@@ -110,6 +111,7 @@ const EDIT_ORDER_ITEM_MUTATION = gql`
 
 const FormContainer = styled.div`
   width: 100%;
+  max-width: 800px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -119,7 +121,7 @@ const FormContainer = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 40%;
+  width: 100%;
   border-radius: 5px;
   padding: 20px 20px;
 `;
@@ -189,7 +191,7 @@ const SearchBt = styled.span`
   margin-right: 2px;
 `;
 
-function SentOrder() {
+function ReturnedOrder() {
   const { id } = useParams();
 
   const { _, data } = useQuery(SEE_ORDER_DETAIL_QUERY, {
@@ -220,7 +222,6 @@ function SentOrder() {
     }
     setVisible(!visible);
 
-    //console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     const zoneCodeInput = document.getElementById("zoneCodeInput");
     zoneCodeInput.value = data.zonecode;
     const shippingAddressInput = document.getElementById(
@@ -232,7 +233,6 @@ function SentOrder() {
   const history = useHistory();
 
   const onCompleted = (data) => {
-    console.log(data);
     const {
       editPaidOrder: { ok, error },
     } = data;
@@ -246,7 +246,6 @@ function SentOrder() {
   };
 
   const onOrderItemCompleted = (data1) => {
-    console.log(data1);
     const {
       createOrderItem: { ok, error },
     } = data1;
@@ -272,29 +271,9 @@ function SentOrder() {
       return;
     }
 
-    console.log(data);
-    const trackingNumber = document.getElementsByName("trackingNumber");
-    const orderItemId = document.getElementsByName("orderItemId");
-    const orderItemStatus = document.getElementsByName("orderItemStatus");
-    const memo = document.getElementsByName("memo");
-    const productBox = document.getElementById("productBox");
-    const productBoxLength = productBox.children.length;
-    for (let i = 0; i < productBoxLength; i++) {
-      data.orderItemId = parseInt(orderItemId[i].value);
-      data.trackingNumber = trackingNumber[i].value;
-      data.orderItemStatus = orderItemStatus[i].value;
-      data.memo = memo[i].value;
-
-      editOrderItem({
-        variables: {
-          ...data,
-        },
-      });
-      console.log(data);
-    }
     data.id = parseInt(data.id);
 
-    data.status = "returned";
+    data.status = "refunded";
     editPaidOrder({
       variables: {
         ...data,
@@ -302,7 +281,6 @@ function SentOrder() {
     });
   };
 
-  console.log(data);
   let creditCard = "";
   let cvcNumber = "";
 
@@ -497,23 +475,21 @@ function SentOrder() {
                     ref={register({ required: "송장번호 입력해주세요" })}
                     name="trackingNumber"
                     placeholder="송장번호번호 16자리 입력"
+                    readOnly
                   ></StyledInput>
                 </FlexBox>
                 <ProductSelectBox>
-                  <select
-                    ref={register({ required: "배송상태를 선택해주세요" })}
-                    name="orderItemStatus"
-                    id="orderItemStatus"
-                  >
-                    <option>배송완료</option>
-                    <option>환불접수</option>
-                    <option>교환접수</option>
-                  </select>
+                  <StyledInput
+                    readOnly
+                    defaultValue={orderItem.status}
+                  ></StyledInput>
                 </ProductSelectBox>
                 <FlexBox>
                   <StyledInput
                     ref={register()}
+                    defaultValue={orderItem.memo}
                     name="memo"
+                    readOnly
                     placeholder="필요시 메모 작성(예: 교환신청 사이즈 36 --> 38, 핑크)"
                   ></StyledInput>
                 </FlexBox>
@@ -551,12 +527,9 @@ function SentOrder() {
               ></StyledInput>
             </InputBox>
           </InfoBox>
-          <CompleteBox>
-            <SaveBt value="반품신청" type="submit"></SaveBt>
-          </CompleteBox>
         </FormContainer>
       </form>
     </div>
   );
 }
-export default SentOrder;
+export default ReturnedOrder;

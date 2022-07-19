@@ -1,9 +1,11 @@
 import { gql, useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import OrderHeader from "../../components/admin/order/Header";
-import PageTitle from "../../components/pageTitle";
+import OrderHeader from "../../../components/admin/order/Header";
+import PageTitle from "../../../components/pageTitle";
 import styled from "styled-components";
+import CryptoJS from "crypto-js";
+
 import {
   Checkbox,
   FlexBox,
@@ -11,11 +13,11 @@ import {
   HiddenInput,
   StyledInput,
   SubHeader,
-} from "../../components/shared";
+} from "../../../components/shared";
 import { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 import { useHistory } from "react-router-dom";
-import routes from "../routes";
+import routes from "../../routes";
 
 const SEE_ORDER_DETAIL_QUERY = gql`
   query SeeOrderDetail($id: Int!) {
@@ -33,7 +35,6 @@ const SEE_ORDER_DETAIL_QUERY = gql`
         firstName
         phone
         age
-        gender
         creditCard
         expireDate
         cvcNumber
@@ -49,15 +50,21 @@ const SEE_ORDER_DETAIL_QUERY = gql`
           shippingZipCode
         }
       }
+      orderItems {
+        id
+        color
+        size
+        amount
+        status
+        trackingNumber
+      }
     }
   }
 `;
 
-const EDIT_NEW_ORDER_MUTATION = gql`
-  mutation editNewOrder(
+const EDIT_PAID_ORDER_MUTATION = gql`
+  mutation editPaidOrder(
     $id: Int!
-    $age: String
-    $gender: String!
     $status: String!
     $addressName: String!
     $shippingName: String!
@@ -65,14 +72,9 @@ const EDIT_NEW_ORDER_MUTATION = gql`
     $shippingAddress: String!
     $shippingDetailAddress: String!
     $shippingZipCode: String!
-    $creditCard: String
-    $expireDate: String
-    $cvcNumber: String
   ) {
-    editNewOrder(
+    editPaidOrder(
       id: $id
-      age: $age
-      gender: $gender
       status: $status
       addressName: $addressName
       shippingName: $shippingName
@@ -80,9 +82,6 @@ const EDIT_NEW_ORDER_MUTATION = gql`
       shippingAddress: $shippingAddress
       shippingDetailAddress: $shippingDetailAddress
       shippingZipCode: $shippingZipCode
-      creditCard: $creditCard
-      expireDate: $expireDate
-      cvcNumber: $cvcNumber
     ) {
       ok
       error
@@ -90,20 +89,18 @@ const EDIT_NEW_ORDER_MUTATION = gql`
   }
 `;
 
-const CREATE_ORDER_ITEM_MUTATION = gql`
-  mutation CreateOrderItem(
-    $orderId: Int
-    $productId: Int
-    $amount: String
-    $size: String
-    $color: String
+const EDIT_ORDER_ITEM_MUTATION = gql`
+  mutation EditOrderItem(
+    $orderItemId: Int!
+    $trackingNumber: String
+    $orderItemStatus: String
+    $memo: String
   ) {
-    createOrderItem(
-      orderId: $orderId
-      productId: $productId
-      amount: $amount
-      size: $size
-      color: $color
+    editOrderItem(
+      orderItemId: $orderItemId
+      trackingNumber: $trackingNumber
+      orderItemStatus: $orderItemStatus
+      memo: $memo
     ) {
       ok
       error
@@ -113,7 +110,6 @@ const CREATE_ORDER_ITEM_MUTATION = gql`
 
 const FormContainer = styled.div`
   width: 100%;
-  max-width: 800px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -123,7 +119,7 @@ const FormContainer = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 100%;
+  width: 40%;
   border-radius: 5px;
   padding: 20px 20px;
 `;
@@ -145,29 +141,12 @@ const ShipInput = styled(StyledInput)`
 const ProductItem = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 40px;
+  height: 100%;
   padding: 30px 20px;
   border-bottom: 1px solid lightgray;
-`;
-
-const ProductSelect = styled.select`
-  width: 100%;
-  height: 38px;
-  border-radius: 2px;
-  padding: 7px 20px;
-  background-color: white;
-  border: 0.5px solid
-    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
-  margin-top: 5px;
-  box-sizing: border-box;
-  &::placeholder {
-    font-size: 12px;
-  }
-  &:focus {
-    border-color: ${(props) => props.theme.primary};
-  }
-  -webkit-appearance: none;
+  border-top: 1px solid ${(props) => props.theme.borderColor};
 `;
 
 const ProductHeader = styled.div`
@@ -176,13 +155,12 @@ const ProductHeader = styled.div`
   align-items: flex-end;
 `;
 
-const ProductButtons = styled.span`
-  margin-left: 20px;
-  cursor: pointer;
+const TrackingText = styled.div`
+  width: 100px;
 `;
 
 const ProductSelectBox = styled.div`
-  margin: 0px 14px;
+  margin: 10px 14px;
 `;
 
 const CompleteBox = styled.div`
@@ -211,12 +189,7 @@ const SearchBt = styled.span`
   margin-right: 2px;
 `;
 
-const StyledCheckBox = styled(Checkbox)`
-  width: 20px;
-  height: 20px;
-`;
-
-function NewOrder() {
+function SentOrder() {
   const { id } = useParams();
 
   const { _, data } = useQuery(SEE_ORDER_DETAIL_QUERY, {
@@ -247,6 +220,7 @@ function NewOrder() {
     }
     setVisible(!visible);
 
+    //console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     const zoneCodeInput = document.getElementById("zoneCodeInput");
     zoneCodeInput.value = data.zonecode;
     const shippingAddressInput = document.getElementById(
@@ -255,39 +229,24 @@ function NewOrder() {
     shippingAddressInput.value = fullAddress;
   };
 
-  console.log(data);
-
-  const addButton = () => {
-    const productItem = document.getElementById("productItem");
-    const productBox = document.getElementById("productBox");
-    const copy = productItem.cloneNode(true);
-    productBox.appendChild(copy);
-  };
-
-  const removeButton = () => {
-    const productBox = document.getElementById("productBox");
-    const productItem = document.getElementById("productItem");
-    if (productBox.children.length > 1) {
-      productBox.removeChild(productItem);
-    }
-  };
-
   const history = useHistory();
 
   const onCompleted = (data) => {
+    console.log(data);
     const {
-      editNewOrder: { ok, error },
+      editPaidOrder: { ok, error },
     } = data;
     if (!ok) {
       return;
     } else {
-      alert("저장이 완료되었습니다.");
+      alert("저장 성공!");
     }
-    history.push(routes.adminOrderNew);
+    history.push(routes.adminOrderPaid);
     window.location.reload();
   };
 
   const onOrderItemCompleted = (data1) => {
+    console.log(data1);
     const {
       createOrderItem: { ok, error },
     } = data1;
@@ -296,11 +255,11 @@ function NewOrder() {
     }
   };
 
-  const [editNewOrder, { loading }] = useMutation(EDIT_NEW_ORDER_MUTATION, {
+  const [editPaidOrder, { loading }] = useMutation(EDIT_PAID_ORDER_MUTATION, {
     onCompleted,
   });
 
-  const [createOrderItem, {}] = useMutation(CREATE_ORDER_ITEM_MUTATION, {
+  const [editOrderItem, {}] = useMutation(EDIT_ORDER_ITEM_MUTATION, {
     onOrderItemCompleted,
   });
 
@@ -313,38 +272,70 @@ function NewOrder() {
       return;
     }
 
-    const size = document.getElementsByName("size");
-    const amount = document.getElementsByName("amount");
-    const color = document.getElementsByName("color");
+    console.log(data);
+    const trackingNumber = document.getElementsByName("trackingNumber");
+    const orderItemId = document.getElementsByName("orderItemId");
+    const orderItemStatus = document.getElementsByName("orderItemStatus");
+    const memo = document.getElementsByName("memo");
     const productBox = document.getElementById("productBox");
     const productBoxLength = productBox.children.length;
     for (let i = 0; i < productBoxLength; i++) {
-      data.size = size[i].value;
-      data.amount = amount[i].value;
-      data.color = color[i].value;
-      data.productId = 1;
-      data.orderId = parseInt(data.id);
+      data.orderItemId = parseInt(orderItemId[i].value);
+      data.trackingNumber = trackingNumber[i].value;
+      data.orderItemStatus = orderItemStatus[i].value;
+      data.memo = memo[i].value;
 
-      if (data.gender === "선택") {
-        alert("성별을 선택해주세요");
-        return null;
-      }
-
-      createOrderItem({
+      editOrderItem({
         variables: {
           ...data,
         },
       });
+      console.log(data);
     }
-
     data.id = parseInt(data.id);
-    data.status = "paid";
-    editNewOrder({
+
+    data.status = "returned";
+    editPaidOrder({
       variables: {
         ...data,
       },
     });
   };
+
+  console.log(data);
+  let creditCard = "";
+  let cvcNumber = "";
+
+  if (data) {
+    const key = process.env.REACT_APP_CRYPTO_JS_KEY;
+    const iv = process.env.REACT_APP_CRYPTO_JS_SALT;
+
+    const keyutf = CryptoJS.enc.Utf8.parse(key);
+    const ivutf = CryptoJS.enc.Utf8.parse(iv);
+
+    const decCreditCard = CryptoJS.AES.decrypt(
+      {
+        ciphertext: CryptoJS.enc.Base64.parse(
+          data?.seeOrderDetail?.user?.creditCard
+        ),
+      },
+      keyutf,
+      { iv: ivutf }
+    );
+
+    const decCvcNumber = CryptoJS.AES.decrypt(
+      {
+        ciphertext: CryptoJS.enc.Base64.parse(
+          data?.seeOrderDetail?.user?.cvcNumber
+        ),
+      },
+      keyutf,
+      { iv: ivutf }
+    );
+
+    creditCard = CryptoJS.enc.Utf8.stringify(decCreditCard);
+    cvcNumber = CryptoJS.enc.Utf8.stringify(decCvcNumber);
+  }
 
   return (
     <div>
@@ -391,14 +382,6 @@ function NewOrder() {
                 type="text"
                 placeholder="나이"
               ></StyledInput>
-            </InputBox>
-            <InputBox>
-              <span>성별</span>
-              <ProductSelect ref={register({ required: "성별" })} name="gender">
-                <option>선택</option>
-                <option>여자</option>
-                <option>남자</option>
-              </ProductSelect>
             </InputBox>
           </InfoBox>
           <InfoBox>
@@ -472,73 +455,70 @@ function NewOrder() {
           <InfoBox>
             <ProductHeader>
               <SubHeader>주문상품</SubHeader>
-              <div>
-                <ProductButtons onClick={addButton}>추가</ProductButtons>
-                <ProductButtons onClick={removeButton}>제거</ProductButtons>
-              </div>
             </ProductHeader>
           </InfoBox>
           <ShipBox id="productBox">
-            <ProductItem id="productItem">
-              <span>옵션</span>
-              <HiddenBox>
-                <span>상품ID</span>
-                <StyledInput defaultValue="1"></StyledInput>
-              </HiddenBox>
-              <ProductSelectBox>
-                <span>사이즈</span>
-                <select
-                  ref={register({ required: "사이즈 옵션을 선택해주세요" })}
-                  name="size"
-                  id="size"
-                >
-                  <option>36(230-235mm)</option>
-                  <option>38(240-245mm)</option>
-                  <option>40(250-255mm)</option>
-                  <option>42(260-265mm)</option>
-                  <option>44(270-275mm)</option>
-                  <option>46(280-285mm)</option>
-                  <option>48(290-295mm)</option>
-                  <option>50(300-305mm)</option>
-                  <option>52(310-315mm)</option>
-                </select>
-              </ProductSelectBox>
-              <ProductSelectBox>
-                <span>컬러</span>
-                <select
-                  ref={register({ required: "색상을 선택해주세요" })}
-                  name="color"
-                  id="color"
-                >
-                  <option>베이지</option>
-                  <option>블랙</option>
-                  <option>네이비</option>
-                  <option>그레이</option>
-                  <option>핑크</option>
-                  <option>옐로우</option>
-                  <option>화이트</option>
-                </select>
-              </ProductSelectBox>
-              <ProductSelectBox>
-                <span>수량</span>
-                <select
-                  ref={register({ required: "수량을 선택해주세요" })}
-                  name="amount"
-                  id="amount"
-                >
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                  <option>6</option>
-                  <option>7</option>
-                  <option>8</option>
-                  <option>9</option>
-                  <option>10</option>
-                </select>
-              </ProductSelectBox>
-            </ProductItem>
+            {data?.seeOrderDetail.orderItems.map((orderItem) => (
+              <ProductItem key={orderItem.id}>
+                <FlexBox>
+                  <HiddenInput
+                    value={parseInt(orderItem.id) || ""}
+                    readOnly
+                    ref={register()}
+                    name="orderItemId"
+                  ></HiddenInput>
+                  <TrackingText>
+                    <span>옵션</span>
+                  </TrackingText>
+                  <HiddenBox>
+                    <span>상품ID</span>
+                    <StyledInput defaultValue="1"></StyledInput>
+                  </HiddenBox>
+                  <span>사이즈 :</span>
+
+                  <ProductSelectBox>
+                    <span>{orderItem.size}</span>
+                  </ProductSelectBox>
+                  <ProductSelectBox>
+                    <span>컬러 :</span>
+                    <span>{orderItem.color}</span>
+                  </ProductSelectBox>
+                  <ProductSelectBox>
+                    <span>수량 :</span>
+                    <span>{orderItem.amount}</span>
+                  </ProductSelectBox>
+                </FlexBox>
+                <FlexBox>
+                  <TrackingText>
+                    <span>송장번호</span>
+                  </TrackingText>
+                  <StyledInput
+                    defaultValue={orderItem.trackingNumber || ""}
+                    ref={register({ required: "송장번호 입력해주세요" })}
+                    name="trackingNumber"
+                    placeholder="송장번호번호 16자리 입력"
+                  ></StyledInput>
+                </FlexBox>
+                <ProductSelectBox>
+                  <select
+                    ref={register({ required: "배송상태를 선택해주세요" })}
+                    name="orderItemStatus"
+                    id="orderItemStatus"
+                  >
+                    <option>배송완료</option>
+                    <option>환불접수</option>
+                    <option>교환접수</option>
+                  </select>
+                </ProductSelectBox>
+                <FlexBox>
+                  <StyledInput
+                    ref={register()}
+                    name="memo"
+                    placeholder="필요시 메모 작성(예: 교환신청 사이즈 36 --> 38, 핑크)"
+                  ></StyledInput>
+                </FlexBox>
+              </ProductItem>
+            ))}
           </ShipBox>
 
           <InfoBox>
@@ -546,37 +526,37 @@ function NewOrder() {
             <InputBox>
               <span>카드번호</span>
               <StyledInput
-                defaultValue={data?.seeOrderDetail?.user?.creditCard || ""}
-                ref={register({ required: "카드번호를 입력해주세요" })}
+                defaultValue={creditCard || ""}
                 name="creditCard"
                 placeholder="카드번호 16자리 입력"
+                readOnly
               ></StyledInput>
             </InputBox>
             <InputBox>
               <span>유효기간(달/연)</span>
               <StyledInput
                 defaultValue={data?.seeOrderDetail?.user?.expireDate || ""}
-                ref={register({ required: "유효기간을 입력해주세요" })}
                 name="expireDate"
                 placeholder="Month/Year 4자리"
+                readOnly
               ></StyledInput>
             </InputBox>
             <InputBox>
               <span>cvc 넘버</span>
               <StyledInput
-                defaultValue={data?.seeOrderDetail?.user?.cvcNumber || ""}
-                ref={register({ required: "cvc넘버를 입력하세요" })}
+                defaultValue={cvcNumber || ""}
                 name="cvcNumber"
                 placeholder="cvc넘버를 입력하세요"
+                readOnly
               ></StyledInput>
             </InputBox>
           </InfoBox>
           <CompleteBox>
-            <SaveBt defaultValue="주문완료" type="submit"></SaveBt>
+            <SaveBt value="반품신청" type="submit"></SaveBt>
           </CompleteBox>
         </FormContainer>
       </form>
     </div>
   );
 }
-export default NewOrder;
+export default SentOrder;

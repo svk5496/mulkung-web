@@ -1,8 +1,8 @@
 import { gql, useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import OrderHeader from "../../components/admin/order/Header";
-import PageTitle from "../../components/pageTitle";
+import OrderHeader from "../../../components/admin/order/Header";
+import PageTitle from "../../../components/pageTitle";
 import styled from "styled-components";
 import CryptoJS from "crypto-js";
 
@@ -13,11 +13,11 @@ import {
   HiddenInput,
   StyledInput,
   SubHeader,
-} from "../../components/shared";
+} from "../../../components/shared";
 import { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 import { useHistory } from "react-router-dom";
-import routes from "../routes";
+import routes from "../../routes";
 
 const SEE_ORDER_DETAIL_QUERY = gql`
   query SeeOrderDetail($id: Int!) {
@@ -55,15 +55,13 @@ const SEE_ORDER_DETAIL_QUERY = gql`
         color
         size
         amount
-        status
-        memo
         trackingNumber
       }
     }
   }
 `;
 
-const EDIT_PAID_ORDER_MUTATION = gql`
+const EDIT_NEW_PAID_MUTATION = gql`
   mutation editPaidOrder(
     $id: Int!
     $status: String!
@@ -91,18 +89,8 @@ const EDIT_PAID_ORDER_MUTATION = gql`
 `;
 
 const EDIT_ORDER_ITEM_MUTATION = gql`
-  mutation EditOrderItem(
-    $orderItemId: Int!
-    $trackingNumber: String
-    $orderItemStatus: String
-    $memo: String
-  ) {
-    editOrderItem(
-      orderItemId: $orderItemId
-      trackingNumber: $trackingNumber
-      orderItemStatus: $orderItemStatus
-      memo: $memo
-    ) {
+  mutation EditOrderItem($orderItemId: Int!, $trackingNumber: String) {
+    editOrderItem(orderItemId: $orderItemId, trackingNumber: $trackingNumber) {
       ok
       error
     }
@@ -111,8 +99,8 @@ const EDIT_ORDER_ITEM_MUTATION = gql`
 
 const FormContainer = styled.div`
   width: 100%;
-  height: 100%;
   max-width: 800px;
+  height: 100%;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -162,7 +150,7 @@ const TrackingText = styled.div`
 `;
 
 const ProductSelectBox = styled.div`
-  margin: 10px 14px;
+  margin: 0px 14px;
 `;
 
 const CompleteBox = styled.div`
@@ -191,7 +179,7 @@ const SearchBt = styled.span`
   margin-right: 2px;
 `;
 
-function ReturnedOrder() {
+function PaidOrder() {
   const { id } = useParams();
 
   const { _, data } = useQuery(SEE_ORDER_DETAIL_QUERY, {
@@ -254,7 +242,7 @@ function ReturnedOrder() {
     }
   };
 
-  const [editPaidOrder, { loading }] = useMutation(EDIT_PAID_ORDER_MUTATION, {
+  const [editPaidOrder, { loading }] = useMutation(EDIT_NEW_PAID_MUTATION, {
     onCompleted,
   });
 
@@ -271,9 +259,23 @@ function ReturnedOrder() {
       return;
     }
 
+    const trackingNumber = document.getElementsByName("trackingNumber");
+    const orderItemId = document.getElementsByName("orderItemId");
+    const productBox = document.getElementById("productBox");
+    const productBoxLength = productBox.children.length;
+    for (let i = 0; i < productBoxLength; i++) {
+      data.orderItemId = parseInt(orderItemId[i].value);
+      data.trackingNumber = trackingNumber[i].value;
+
+      editOrderItem({
+        variables: {
+          ...data,
+        },
+      });
+    }
     data.id = parseInt(data.id);
 
-    data.status = "refunded";
+    data.status = "sent";
     editPaidOrder({
       variables: {
         ...data,
@@ -475,22 +477,6 @@ function ReturnedOrder() {
                     ref={register({ required: "송장번호 입력해주세요" })}
                     name="trackingNumber"
                     placeholder="송장번호번호 16자리 입력"
-                    readOnly
-                  ></StyledInput>
-                </FlexBox>
-                <ProductSelectBox>
-                  <StyledInput
-                    readOnly
-                    defaultValue={orderItem.status}
-                  ></StyledInput>
-                </ProductSelectBox>
-                <FlexBox>
-                  <StyledInput
-                    ref={register()}
-                    defaultValue={orderItem.memo}
-                    name="memo"
-                    readOnly
-                    placeholder="필요시 메모 작성(예: 교환신청 사이즈 36 --> 38, 핑크)"
                   ></StyledInput>
                 </FlexBox>
               </ProductItem>
@@ -503,7 +489,6 @@ function ReturnedOrder() {
               <span>카드번호</span>
               <StyledInput
                 defaultValue={creditCard || ""}
-                name="creditCard"
                 placeholder="카드번호 16자리 입력"
                 readOnly
               ></StyledInput>
@@ -512,7 +497,6 @@ function ReturnedOrder() {
               <span>유효기간(달/연)</span>
               <StyledInput
                 defaultValue={data?.seeOrderDetail?.user?.expireDate || ""}
-                name="expireDate"
                 placeholder="Month/Year 4자리"
                 readOnly
               ></StyledInput>
@@ -521,18 +505,17 @@ function ReturnedOrder() {
               <span>cvc 넘버</span>
               <StyledInput
                 defaultValue={cvcNumber || ""}
-                name="cvcNumber"
                 placeholder="cvc넘버를 입력하세요"
                 readOnly
               ></StyledInput>
             </InputBox>
           </InfoBox>
           <CompleteBox>
-            <SaveBt value="환불 완료" type="submit"></SaveBt>
+            <SaveBt value="주문완료" type="submit"></SaveBt>
           </CompleteBox>
         </FormContainer>
       </form>
     </div>
   );
 }
-export default ReturnedOrder;
+export default PaidOrder;

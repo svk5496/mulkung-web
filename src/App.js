@@ -12,7 +12,7 @@ import SentLayout from "./components/admin/order/SentLayout";
 import ReturnedLayout from "./components/admin/order/ReturnedLayout";
 import Layout from "./components/Layout";
 import AdminLogin from "./screens/AdminLogin";
-import NewOrder from "./screens/admin/NewOrder";
+import NewOrder from "./screens/admin/order/NewOrder";
 import AdminSignUp from "./screens/AdminSignUp";
 import AdminStore from "./screens/AdminStore";
 import Home from "./screens/Home";
@@ -20,17 +20,19 @@ import Login from "./screens/Login";
 import NotFound from "./screens/NotFound";
 import routes from "./screens/routes";
 import { darkTheme, GlobalStyles, lightTheme } from "./styles";
-import PaidOrder from "./screens/admin/PaidOrder";
-import SentOrder from "./screens/admin/SentOrder";
-import ReturnedOrder from "./screens/admin/ReturnedOrder";
-import RefundedOrder from "./screens/admin/RefundedOrder";
-import CreateOrder from "./screens/admin/CreateOrder";
+import PaidOrder from "./screens/admin/order/PaidOrder";
+import SentOrder from "./screens/admin/order/SentOrder";
+import ReturnedOrder from "./screens/admin/order/ReturnedOrder";
+import RefundedOrder from "./screens/admin/order/RefundedOrder";
+import CreateOrder from "./screens/admin/order/CreateOrder";
 import RefundedLayout from "./components/admin/order/RefundedLayout";
 import ProductListLayout from "./components/admin/product/ProductListLayout";
-import EditLayout from "./components/admin/product/EditLayout";
+import EditLayout from "./components/admin/product/EditBox";
 import ProductUploadLayout from "./components/admin/product/UploadLayout";
 import UserListLayout from "./components/admin/user/UserListLayout";
 import Product from "./screens/Product";
+import ProductDetail from "./screens/admin/product/ProductDetail";
+import UserDetail from "./screens/admin/user/UserDetail";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -70,6 +72,11 @@ function App() {
                       <UserListLayout></UserListLayout>
                     </AdminLayout>
                   </Route>
+                  <Route path={routes.adminUserEdit} exact>
+                    <AdminLayout>
+                      <UserDetail></UserDetail>
+                    </AdminLayout>
+                  </Route>
                   {/* 관리자 상품관리 */}
                   <Route path={routes.adminProduct} exact>
                     <AdminLayout>
@@ -78,7 +85,7 @@ function App() {
                   </Route>
                   <Route path={routes.adminProductEdit} exact>
                     <AdminLayout>
-                      <EditLayout></EditLayout>
+                      <ProductDetail></ProductDetail>
                     </AdminLayout>
                   </Route>
                   <Route path={routes.adminProductNew} exact>

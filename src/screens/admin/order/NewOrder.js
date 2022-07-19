@@ -1,27 +1,64 @@
 import { gql, useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import OrderHeader from "../../components/admin/order/Header";
-import PageTitle from "../../components/pageTitle";
+import OrderHeader from "../../../components/admin/order/Header";
+import PageTitle from "../../../components/pageTitle";
 import styled from "styled-components";
 import {
   Checkbox,
   FlexBox,
+  HiddenBox,
+  HiddenInput,
   StyledInput,
   SubHeader,
-} from "../../components/shared";
+} from "../../../components/shared";
 import { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 import { useHistory } from "react-router-dom";
-import routes from "../routes";
+import routes from "../../routes";
 
-const CREATE_ORDER_MUTATION = gql`
-  mutation createOrder(
-    $firstName: String!
+const SEE_ORDER_DETAIL_QUERY = gql`
+  query SeeOrderDetail($id: Int!) {
+    seeOrderDetail(id: $id) {
+      id
+      orderMethod
+      status
+      o_name
+      o_phone
+      o_address
+      o_detailAddress
+      o_zipCode
+      user {
+        id
+        firstName
+        phone
+        age
+        gender
+        creditCard
+        expireDate
+        cvcNumber
+        d_zipCode
+        d_address
+        d_detailAddress
+        shippingAddresses {
+          addressName
+          shippingName
+          shippingPhone
+          shippingAddress
+          shippingDetailAddress
+          shippingZipCode
+        }
+      }
+    }
+  }
+`;
+
+const EDIT_NEW_ORDER_MUTATION = gql`
+  mutation editNewOrder(
+    $id: Int!
     $age: String
-    $phone: String!
+    $gender: String!
     $status: String!
-    $orderMethod: String!
     $addressName: String!
     $shippingName: String!
     $shippingPhone: String!
@@ -32,12 +69,11 @@ const CREATE_ORDER_MUTATION = gql`
     $expireDate: String
     $cvcNumber: String
   ) {
-    createOrder(
-      firstName: $firstName
+    editNewOrder(
+      id: $id
       age: $age
-      phone: $phone
+      gender: $gender
       status: $status
-      orderMethod: $orderMethod
       addressName: $addressName
       shippingName: $shippingName
       shippingPhone: $shippingPhone
@@ -55,12 +91,9 @@ const CREATE_ORDER_MUTATION = gql`
 `;
 
 const CREATE_ORDER_ITEM_MUTATION = gql`
-  mutation createOrderItem(
+  mutation CreateOrderItem(
     $orderId: Int
     $productId: Int
-    $firstName: String
-    $phone: String
-    $status: String
     $amount: String
     $size: String
     $color: String
@@ -68,9 +101,6 @@ const CREATE_ORDER_ITEM_MUTATION = gql`
     createOrderItem(
       orderId: $orderId
       productId: $productId
-      firstName: $firstName
-      phone: $phone
-      status: $status
       amount: $amount
       size: $size
       color: $color
@@ -83,6 +113,7 @@ const CREATE_ORDER_ITEM_MUTATION = gql`
 
 const FormContainer = styled.div`
   width: 100%;
+  max-width: 800px;
   height: 100%;
   margin: auto;
   display: flex;
@@ -92,7 +123,7 @@ const FormContainer = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 40%;
+  width: 100%;
   border-radius: 5px;
   padding: 20px 20px;
 `;
@@ -118,6 +149,25 @@ const ProductItem = styled.div`
   height: 40px;
   padding: 30px 20px;
   border-bottom: 1px solid lightgray;
+`;
+
+const ProductSelect = styled.select`
+  width: 100%;
+  height: 38px;
+  border-radius: 2px;
+  padding: 7px 20px;
+  background-color: white;
+  border: 0.5px solid
+    ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
+  margin-top: 5px;
+  box-sizing: border-box;
+  &::placeholder {
+    font-size: 12px;
+  }
+  &:focus {
+    border-color: ${(props) => props.theme.primary};
+  }
+  -webkit-appearance: none;
 `;
 
 const ProductHeader = styled.div`
@@ -166,7 +216,15 @@ const StyledCheckBox = styled(Checkbox)`
   height: 20px;
 `;
 
-function CreateOrder() {
+function NewOrder() {
+  const { id } = useParams();
+
+  const { _, data } = useQuery(SEE_ORDER_DETAIL_QUERY, {
+    variables: {
+      id: parseInt(id),
+    },
+  });
+
   const [visible, setVisible] = useState(false);
 
   const searchBt = () => {
@@ -189,7 +247,6 @@ function CreateOrder() {
     }
     setVisible(!visible);
 
-    //console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     const zoneCodeInput = document.getElementById("zoneCodeInput");
     zoneCodeInput.value = data.zonecode;
     const shippingAddressInput = document.getElementById(
@@ -197,6 +254,8 @@ function CreateOrder() {
     );
     shippingAddressInput.value = fullAddress;
   };
+
+  console.log(data);
 
   const addButton = () => {
     const productItem = document.getElementById("productItem");
@@ -217,16 +276,18 @@ function CreateOrder() {
 
   const onCompleted = (data) => {
     const {
-      createOrder: { ok, error },
+      editNewOrder: { ok, error },
     } = data;
     if (!ok) {
-      console.log("!ok");
       return;
+    } else {
+      alert("저장이 완료되었습니다.");
     }
+    history.push(routes.adminOrderNew);
+    window.location.reload();
   };
 
   const onOrderItemCompleted = (data1) => {
-    console.log("hi");
     const {
       createOrderItem: { ok, error },
     } = data1;
@@ -235,16 +296,13 @@ function CreateOrder() {
     }
   };
 
-  const [createOrder, {}] = useMutation(CREATE_ORDER_MUTATION, {
+  const [editNewOrder, { loading }] = useMutation(EDIT_NEW_ORDER_MUTATION, {
     onCompleted,
   });
 
-  const [createOrderItem, { loading }] = useMutation(
-    CREATE_ORDER_ITEM_MUTATION,
-    {
-      onOrderItemCompleted,
-    }
-  );
+  const [createOrderItem, {}] = useMutation(CREATE_ORDER_ITEM_MUTATION, {
+    onOrderItemCompleted,
+  });
 
   const { register, handleSubmit, errors, formState, getValues } = useForm({
     mode: "onBlur",
@@ -254,40 +312,38 @@ function CreateOrder() {
     if (loading) {
       return;
     }
-    data.orderMethod = "phone";
-    data.status = "paid";
-
-    createOrder({
-      variables: {
-        ...data,
-      },
-    });
 
     const size = document.getElementsByName("size");
     const amount = document.getElementsByName("amount");
     const color = document.getElementsByName("color");
     const productBox = document.getElementById("productBox");
     const productBoxLength = productBox.children.length;
+    for (let i = 0; i < productBoxLength; i++) {
+      data.size = size[i].value;
+      data.amount = amount[i].value;
+      data.color = color[i].value;
+      data.productId = 1;
+      data.orderId = parseInt(data.id);
 
-    setTimeout(() => {
-      for (let i = 0; i < productBoxLength; i++) {
-        data.size = size[i].value;
-        data.amount = amount[i].value;
-        data.color = color[i].value;
-        data.productId = 1;
-        data.status = "paid";
-        createOrderItem({
-          variables: {
-            ...data,
-          },
-        });
+      if (data.gender === "선택") {
+        alert("성별을 선택해주세요");
+        return null;
       }
-    }, 2000);
 
-    alert("저장이 완료되었습니다.");
+      createOrderItem({
+        variables: {
+          ...data,
+        },
+      });
+    }
 
-    history.push(routes.adminOrderPaid);
-    window.location.reload();
+    data.id = parseInt(data.id);
+    data.status = "paid";
+    editNewOrder({
+      variables: {
+        ...data,
+      },
+    });
   };
 
   return (
@@ -296,11 +352,20 @@ function CreateOrder() {
       <OrderHeader></OrderHeader>
       <form onSubmit={handleSubmit(onSubmitValid)}>
         <FormContainer>
+          <HiddenInput
+            value={parseInt(data?.seeOrderDetail?.id) || ""}
+            readOnly
+            ref={register()}
+            name="id"
+            type="text"
+            placeholder="이름"
+          ></HiddenInput>
           <InfoBox>
             <SubHeader>개인정보</SubHeader>
             <InputBox>
               <span>이름</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.firstName || ""}
                 ref={register({ required: "이름을 입력해주세요" })}
                 name="firstName"
                 type="text"
@@ -310,6 +375,7 @@ function CreateOrder() {
             <InputBox>
               <span>번호</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.phone || ""}
                 ref={register({ required: "번호를 입력해주세요" })}
                 name="phone"
                 type="text"
@@ -319,11 +385,20 @@ function CreateOrder() {
             <InputBox>
               <span>나이</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.age || ""}
                 ref={register({ required: "나이를 입력해주세요" })}
                 name="age"
                 type="text"
                 placeholder="나이"
               ></StyledInput>
+            </InputBox>
+            <InputBox>
+              <span>성별</span>
+              <ProductSelect ref={register({ required: "성별" })} name="gender">
+                <option>선택</option>
+                <option>여자</option>
+                <option>남자</option>
+              </ProductSelect>
             </InputBox>
           </InfoBox>
           <InfoBox>
@@ -340,6 +415,7 @@ function CreateOrder() {
             <InputBox>
               <span>배송 받으시는 분 이름</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.firstName || ""}
                 placeholder="받는 사람 이름"
                 ref={register({ required: "이름을 입력" })}
                 name="shippingName"
@@ -348,6 +424,7 @@ function CreateOrder() {
             <InputBox>
               <span>배송 받은시는 분 번호</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.phone || ""}
                 placeholder="받는 사람 번호"
                 ref={register({ required: "전화번호를 입력" })}
                 name="shippingPhone"
@@ -357,6 +434,7 @@ function CreateOrder() {
               <span>배송지</span>
               <FlexBox>
                 <ShipInput
+                  defaultValue={data?.seeOrderDetail?.user?.d_zipCode || ""}
                   readOnly
                   ref={register({ required: "우편번호를 입력해주세요" })}
                   name="shippingZipCode"
@@ -374,6 +452,7 @@ function CreateOrder() {
 
             <InputBox>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.d_address || ""}
                 readOnly
                 ref={register({ required: "주소를 입력해주세요" })}
                 name="shippingAddress"
@@ -383,6 +462,7 @@ function CreateOrder() {
             </InputBox>
             <InputBox>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.d_detailAddress || ""}
                 ref={register({ required: "나머지 주소 입력" })}
                 name="shippingDetailAddress"
                 placeholder="나머지 주소 입력"
@@ -401,7 +481,10 @@ function CreateOrder() {
           <ShipBox id="productBox">
             <ProductItem id="productItem">
               <span>옵션</span>
-
+              <HiddenBox>
+                <span>상품ID</span>
+                <StyledInput defaultValue="1"></StyledInput>
+              </HiddenBox>
               <ProductSelectBox>
                 <span>사이즈</span>
                 <select
@@ -463,6 +546,7 @@ function CreateOrder() {
             <InputBox>
               <span>카드번호</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.creditCard || ""}
                 ref={register({ required: "카드번호를 입력해주세요" })}
                 name="creditCard"
                 placeholder="카드번호 16자리 입력"
@@ -471,6 +555,7 @@ function CreateOrder() {
             <InputBox>
               <span>유효기간(달/연)</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.expireDate || ""}
                 ref={register({ required: "유효기간을 입력해주세요" })}
                 name="expireDate"
                 placeholder="Month/Year 4자리"
@@ -479,6 +564,7 @@ function CreateOrder() {
             <InputBox>
               <span>cvc 넘버</span>
               <StyledInput
+                defaultValue={data?.seeOrderDetail?.user?.cvcNumber || ""}
                 ref={register({ required: "cvc넘버를 입력하세요" })}
                 name="cvcNumber"
                 placeholder="cvc넘버를 입력하세요"
@@ -493,4 +579,4 @@ function CreateOrder() {
     </div>
   );
 }
-export default CreateOrder;
+export default NewOrder;

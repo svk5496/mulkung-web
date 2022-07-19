@@ -214,7 +214,7 @@ function ProductDetail() {
               <span></span>
             </UpperDashBox>
             <MiddleDashBox>
-              <span>{data?.seeProductDashBoard?.countOrders}</span>
+              <span>{data?.seeProductDashBoard?.countOrders || "0"}</span>
             </MiddleDashBox>
             <BottomDashBox></BottomDashBox>
           </DashBox>
@@ -224,7 +224,7 @@ function ProductDetail() {
               <span></span>
             </UpperDashBox>
             <MiddleDashBox>
-              <span>{data?.seeProductDashBoard?.countOrderItems}</span>
+              <span>{data?.seeProductDashBoard?.countOrderItems || "0"}</span>
             </MiddleDashBox>
             <BottomDashBox></BottomDashBox>
           </DashBox>
@@ -234,7 +234,9 @@ function ProductDetail() {
               <span></span>
             </UpperDashBox>
             <MiddleDashBox>
-              <span>{data?.seeProductDashBoard?.TotalPurchase7Days}</span>
+              <span>
+                {data?.seeProductDashBoard?.TotalPurchase7Days || "0"}
+              </span>
             </MiddleDashBox>
             <BottomDashBox></BottomDashBox>
           </DashBox>
@@ -248,7 +250,7 @@ function ProductDetail() {
             <ChartBox>
               <Chart
                 options={option.options}
-                series={data?.seeProductDashBoard?.chart1Object}
+                series={data?.seeProductDashBoard?.chart1Object || ""}
                 width="330"
                 type="area"
               ></Chart>

@@ -62,7 +62,7 @@ const SEE_USER_DETAIL_QUERY = gql`
 
 function UserDetail() {
   const { id } = useParams();
-  const { _, data } = useQuery(SEE_USER_DETAIL_QUERY, {
+  const { _, data, loading } = useQuery(SEE_USER_DETAIL_QUERY, {
     variables: {
       id: parseInt(id),
     },
@@ -79,7 +79,7 @@ function UserDetail() {
 
     const decCreditCard = CryptoJS.AES.decrypt(
       {
-        ciphertext: CryptoJS.enc.Base64.parse(data?.seeUser?.creditCard),
+        ciphertext: CryptoJS.enc.Base64.parse(data?.seeUser?.creditCard || ""),
       },
       keyutf,
       { iv: ivutf }
@@ -87,7 +87,7 @@ function UserDetail() {
 
     const decCvcNumber = CryptoJS.AES.decrypt(
       {
-        ciphertext: CryptoJS.enc.Base64.parse(data?.seeUser?.cvcNumber),
+        ciphertext: CryptoJS.enc.Base64.parse(data?.seeUser?.cvcNumber || ""),
       },
       keyutf,
       { iv: ivutf }
@@ -96,8 +96,9 @@ function UserDetail() {
     creditCard = CryptoJS.enc.Utf8.stringify(decCreditCard);
     cvcNumber = CryptoJS.enc.Utf8.stringify(decCvcNumber);
   }
-
-  console.log(data);
+  if (data) {
+    console.log(data);
+  }
   return (
     <Base>
       <InfoBox>
@@ -106,41 +107,44 @@ function UserDetail() {
           <StyledTitle>이름</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.firstName}
+            defaultValue={data?.seeUser?.firstName || ""}
           ></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>나이</StyledTitle>
-          <StyledInput readOnly defaultValue={data?.seeUser?.age}></StyledInput>
+          <StyledInput
+            readOnly
+            defaultValue={data?.seeUser?.age || ""}
+          ></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>성별</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.gender}
+            defaultValue={data?.seeUser?.gender || ""}
           ></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>번호</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.phone}
+            defaultValue={data?.seeUser?.phone || ""}
           ></StyledInput>
         </StyledBox>
 
         <StyledBox>
           <StyledTitle>카드번호</StyledTitle>
-          <StyledInput readOnly defaultValue={creditCard}></StyledInput>
+          <StyledInput readOnly defaultValue={creditCard || ""}></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>cvc</StyledTitle>
-          <StyledInput readOnly defaultValue={cvcNumber}></StyledInput>
+          <StyledInput readOnly defaultValue={cvcNumber || ""}></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>만료일자</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.expireDate}
+            defaultValue={data?.seeUser?.expireDate || ""}
           ></StyledInput>
         </StyledBox>
       </InfoBox>
@@ -150,7 +154,7 @@ function UserDetail() {
           <StyledTitle>총 구매횟수</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.totalPurchase}
+            defaultValue={data?.seeUser?.totalPurchase || ""}
           ></StyledInput>
         </StyledBox>
       </InfoBox>
@@ -160,14 +164,14 @@ function UserDetail() {
           <StyledTitle>주소</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.d_address}
+            defaultValue={data?.seeUser?.d_address || ""}
           ></StyledInput>
         </StyledBox>
         <StyledBox>
           <StyledTitle>상세주소</StyledTitle>
           <StyledInput
             readOnly
-            defaultValue={data?.seeUser?.d_detailAddress}
+            defaultValue={data?.seeUser?.d_detailAddress || ""}
           ></StyledInput>
         </StyledBox>
       </InfoBox>

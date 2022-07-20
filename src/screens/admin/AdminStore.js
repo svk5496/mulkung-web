@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import routes from "./routes";
+import routes from "../routes";
 import Chart from "react-apexcharts";
 import {
   formatedDay0,
@@ -11,7 +11,7 @@ import {
   formatedDay4,
   formatedDay5,
   formatedDay6,
-} from "../components/sharedFunction";
+} from "../../components/sharedFunction";
 
 const Base = styled.div`
   width: 100%;

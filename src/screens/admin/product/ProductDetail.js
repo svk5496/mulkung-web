@@ -205,62 +205,65 @@ function ProductDetail() {
           <span>수정하기</span>
         </EditModeBt>
       </Header>
-      {editMode ? <EditBox></EditBox> : null}
-      <InfoBox>
-        <DashContainer>
-          <DashBox>
-            <UpperDashBox>
-              <h1>구입하기 클릭수(total)</h1>
-              <span></span>
-            </UpperDashBox>
-            <MiddleDashBox>
-              <span>{data?.seeProductDashBoard?.countOrders || "0"}</span>
-            </MiddleDashBox>
-            <BottomDashBox></BottomDashBox>
-          </DashBox>
-          <DashBox>
-            <UpperDashBox>
-              <h1>실제 구매 수</h1>
-              <span></span>
-            </UpperDashBox>
-            <MiddleDashBox>
-              <span>{data?.seeProductDashBoard?.countOrderItems || "0"}</span>
-            </MiddleDashBox>
-            <BottomDashBox></BottomDashBox>
-          </DashBox>
-          <DashBox>
-            <UpperDashBox>
-              <h1>구입하기 클릭수(7일)</h1>
-              <span></span>
-            </UpperDashBox>
-            <MiddleDashBox>
-              <span>
-                {data?.seeProductDashBoard?.TotalPurchase7Days || "0"}
-              </span>
-            </MiddleDashBox>
-            <BottomDashBox></BottomDashBox>
-          </DashBox>
-        </DashContainer>
-        <ChartContainer>
-          <DashBox>
-            <UpperDashBox>
-              <h1>1주 판매량</h1>
-              <span></span>
-            </UpperDashBox>
-            <ChartBox>
-              <Chart
-                options={option.options}
-                series={data?.seeProductDashBoard?.chart1Object || ""}
-                width="330"
-                type="area"
-              ></Chart>
-            </ChartBox>
-            <ChartBottomBox>
-              <span></span>
-            </ChartBottomBox>
-          </DashBox>
-        </ChartContainer>
-      </InfoBox>
+      {editMode ? (
+        <EditBox></EditBox>
+      ) : (
+        <InfoBox>
+          <DashContainer>
+            <DashBox>
+              <UpperDashBox>
+                <h1>구입하기 클릭수(total)</h1>
+                <span></span>
+              </UpperDashBox>
+              <MiddleDashBox>
+                <span>{data?.seeProductDashBoard?.countOrders || "0"}</span>
+              </MiddleDashBox>
+              <BottomDashBox></BottomDashBox>
+            </DashBox>
+            <DashBox>
+              <UpperDashBox>
+                <h1>실제 구매 수</h1>
+                <span></span>
+              </UpperDashBox>
+              <MiddleDashBox>
+                <span>{data?.seeProductDashBoard?.countOrderItems || "0"}</span>
+              </MiddleDashBox>
+              <BottomDashBox></BottomDashBox>
+            </DashBox>
+            <DashBox>
+              <UpperDashBox>
+                <h1>구입하기 클릭수(7일)</h1>
+                <span></span>
+              </UpperDashBox>
+              <MiddleDashBox>
+                <span>
+                  {data?.seeProductDashBoard?.TotalPurchase7Days || "0"}
+                </span>
+              </MiddleDashBox>
+              <BottomDashBox></BottomDashBox>
+            </DashBox>
+          </DashContainer>
+          <ChartContainer>
+            <DashBox>
+              <UpperDashBox>
+                <h1>1주 판매량</h1>
+                <span></span>
+              </UpperDashBox>
+              <ChartBox>
+                <Chart
+                  options={option.options}
+                  series={data?.seeProductDashBoard?.chart1Object || ""}
+                  width="330"
+                  type="area"
+                ></Chart>
+              </ChartBox>
+              <ChartBottomBox>
+                <span></span>
+              </ChartBottomBox>
+            </DashBox>
+          </ChartContainer>
+        </InfoBox>
+      )}
     </UploadContainer>
   );
 }
